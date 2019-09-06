@@ -1,22 +1,26 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import Home from './views/Home.vue'
+import Vue from "vue";
+import Router from "vue-router";
+import Home from "./views/Home.vue";
 
-Vue.use(Router)
+Vue.use(Router);
 
 export default new Router({
-  mode: 'history',
-  base: process.env.BASE_URL,
+  mode: "history",
   routes: [
     {
-      path: '/',
-      name: 'home',
+      path: "/",
+      name: "home",
       component: Home
     },
     {
-      path: '/escolhe-grupo',
-      name: 'escolheGrupo',
-      component: () => import('./views/PrimeiroAcesso.vue')
+      path: "/callback",
+      name: "callbackGoogle",
+      component: () => import("./views/CallbackGoogle.vue")
+    },
+    {
+      path: "/escolhe-grupo",
+      name: "escolheGrupo",
+      component: () => import("./views/PrimeiroAcesso.vue")
     }
   ]
-})
+});

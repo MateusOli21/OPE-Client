@@ -1,5 +1,6 @@
-import axios from 'axios';
+import axios from "axios";
+const { VUE_APP_SERVER_ENDPOINT } = process.env;
 
 export const http = axios.create({
-    baseURL: 'https://pokeapi.co/api/v2/'
-})
+  baseURL: VUE_APP_SERVER_ENDPOINT
+});
