@@ -32,7 +32,7 @@ export default {
       } = await Login.getGoogleURL();
       this.url = googleUrl;
     } catch (err) {
-      this.$swal(err);
+      this.$swal('Não foi possível pegar a URL do Google');
     }
   }
 };

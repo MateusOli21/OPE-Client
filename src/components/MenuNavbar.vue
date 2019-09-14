@@ -1,7 +1,7 @@
 <template>
   <v-menu offset-y open-on-hover>
     <template v-slot:activator="{on}">
-      <v-btn fab small text dark slot="activator" v-on="on" @click="drawer = !drawer">
+      <v-btn fab small text dark slot="activator" v-on="on" @click="drawer = !drawer" style="width: 150px !important">
         <v-icon small>{{user.username}}</v-icon>
       </v-btn>
     </template>
@@ -52,7 +52,7 @@
           <v-list-item-title>Ajuda</v-list-item-title>
         </v-list-item>
 
-        <v-list-item link>
+        <v-list-item link v-on:click="logout">
           <v-list-item-icon>
             <v-icon>exit_to_app</v-icon>
           </v-list-item-icon>
@@ -65,17 +65,22 @@
 
 <script>
 export default {
-  name: "teste",
-  data() {
+  props() {
     return {
       user: "ss"
     };
   },
-  beforeCreate() {
-    // const user = JSON.parse(localStorage.getItem("userData"));
-    // this.user = user;
-    // eslint-disable-next-line
-    console.log("user:", this.user);
+  methods: {
+    logout: function () {
+      localStorage.clear()
+      this.$router.push('/')
+      this.$router.go('/')
+    }
+  },
+  created() {
+    const user = JSON.parse(localStorage.getItem("userData"));
+    this.user = user;
+    setTimeout(() => this.$forceUpdate(), 3000)
   }
 };
 </script>

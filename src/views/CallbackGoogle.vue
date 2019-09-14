@@ -1,16 +1,18 @@
 <template>
-  <div></div>
+  <div>Carregando...</div>
 </template>
 
 <script>
 import * as Login from "@/services/authGoogle.js";
 
 export default {
+  /* eslint-disable */
   async beforeCreate() {
     try {
       const code = window.location.href.split("code=")[1];
       const response = await Login.getUserData(code);
       if (response.status === 200) {
+        console.log('deu 200')
         localStorage.setItem("userData", JSON.stringify(response.data.user));
         this.$router.push("/escolhe-grupo");
       } else {
