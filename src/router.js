@@ -10,17 +10,36 @@ export default new Router({
     {
       path: "/",
       name: "home",
-      component: Home
+      component: Home,
+      beforeEnter: (to, from, next) => {
+        if(localStorage.getItem('userData')) return next('/escolhe-grupo')
+        next()
+      }
     },
     {
       path: "/callback",
       name: "callbackGoogle",
-      component: () => import("./views/CallbackGoogle.vue")
+      component: () => import("./views/CallbackGoogle.vue"),
+      beforeEnter: (to, from, next) => {
+        if(localStorage.getItem('userData')) return next('/escolhe-grupo')
+        next()
+      }
     },
     {
       path: "/escolhe-grupo",
       name: "escolheGrupo",
-      component: () => import("./views/PrimeiroAcesso.vue")
+      component: () => import("./views/PrimeiroAcesso.vue"),
+      beforeEnter: (to, from, next) => {
+        if(localStorage.getItem('userData')) return next()
+        next('/')        
+      }
+    },
+    {
+      path: "*",
+      beforeEnter: (to, from, next) => {
+        if(localStorage.getItem('userData')) return next('/escolhe-grupo')
+        next('/')        
+      }
     }
   ]
 });
