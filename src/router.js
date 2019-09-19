@@ -21,6 +21,16 @@ export default new Router({
       path: "/escolhe-grupo",
       name: "escolheGrupo",
       component: () => import("./views/PrimeiroAcesso.vue")
+    },
+    {
+      path: "/pagina-grupo-aluno",
+      name: "paginaGrupoAluno",
+      component: ()=> import("./views/PaginaGrupoAluno.vue")
+    },
+    {
+      path: "/pagina-grupo-professor",
+      name: "paginaGrupoProfessor",
+      component: ()=> import("./views/PaginaGrupoProfessor.vue")
     }
   ]
 });
