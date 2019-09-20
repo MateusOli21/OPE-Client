@@ -10,23 +10,23 @@
             <v-spacer></v-spacer>
 
             <!-- menu dropdown-->
-            <MenuNavbar/>    
+            <MenuNavbar/>
 
             <!-- icone para abrir navegação lateral
             <v-btn fab small text dark @click="drawer = !drawer">
                 <v-icon large>account_circle</v-icon>
             </v-btn>
             -->
-            
+
 
         </v-toolbar>
 
-        <!-- navegação lateral 
+        <!-- navegação lateral
         <v-navigation-drawer app right temporary v-model="drawer">
                 <h1>abcd</h1>
         </v-navigation-drawer>
-        --> 
-            
+        -->
+
      </nav>
 </template>
 
@@ -36,15 +36,15 @@ import MenuNavbar from '@/components/MenuNavbar';
 
 
 export default {
-    name: 'Navbar',
-    components:{
-        MenuNavbar
-    },
-    data(){
-        return{
-            drawer: false,
-        }
-    }
+  name: 'Navbar',
+  components:{
+      MenuNavbar
+  },
+  data(){
+      return{
+          drawer: false,
+      }
+  }
 }
 </script>
 
