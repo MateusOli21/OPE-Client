@@ -32,7 +32,16 @@ export default new Router({
       beforeEnter: (to, from, next) => {
         if(localStorage.getItem('userData')) return next()
         next('/')        
-      }
+     },
+    {
+      path: "/pagina-grupo-aluno",
+      name: "paginaGrupoAluno",
+      component: ()=> import("./views/PaginaGrupoAluno.vue")
+    },
+    {
+      path: "/pagina-grupo-professor",
+      name: "paginaGrupoProfessor",
+      component: ()=> import("./views/PaginaGrupoProfessor.vue")
     },
     {
       path: "*",
