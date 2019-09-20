@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <template v-if=" !['home', 'callbackGoogle'].includes($route.name)">
+    <template v-if=" !['home', 'handleRouter'].includes($route.name)">
       <Navbar />
     </template>
     <v-content>

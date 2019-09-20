@@ -2,7 +2,7 @@
   <v-menu offset-y open-on-hover>
     <template v-slot:activator="{on}">
       <v-btn fab small text dark slot="activator" v-on="on" @click="drawer = !drawer" style="width: 150px !important">
-        <v-icon small>account_circle</v-icon>
+        <v-icon small>{{user.username}}</v-icon>
       </v-btn>
     </template>
 
@@ -65,9 +65,9 @@
 
 <script>
 export default {
-  props() {
+  data() {
     return {
-      user: "ss"
+      user: ""
     };
   },
   methods: {
@@ -80,7 +80,6 @@ export default {
   created() {
     const user = JSON.parse(localStorage.getItem("userData"));
     this.user = user;
-    setTimeout(() => this.$forceUpdate(), 3000)
   }
 };
 </script>

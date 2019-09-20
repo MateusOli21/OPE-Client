@@ -10,14 +10,8 @@
 import * as Login from "@/services/authGoogle.js";
 import Loading from "vue-loading-overlay"
 export default {
-  /* eslint-disable */
+  name: "handleRouter",
   data() {
-    return {
-      visible: true,
-      fullPage: true
-    }
-  },
-  props() {
     return {
       visible: true,
       fullPage: true
@@ -28,12 +22,14 @@ export default {
       const code = window.location.href.split("code=")[1];
       const response = await Login.getUserData(code);
       if (response.status === 200) {
-        console.log('deu 200')
-        localStorage.setItem("userData", JSON.stringify(response.data.user));
-        this.$router.push("/escolhe-grupo");
-      } else {
-        this.$router.push("/");
-      }
+        const { user } = response.data;
+        localStorage.setItem("userData", JSON.stringify(user));
+        if (user.isStudent) {
+          if (user.groupId) {
+            return this.$router.push("/grupo-aluno");
+          } else return this.$router.push("/escolhe-grupo");
+        } else if (!user.isStudent) return this.$router.push("/pagina-professor");
+      } else return this.$router.push("/");
     } catch (err) {
       this.$router.push("/");
     }
