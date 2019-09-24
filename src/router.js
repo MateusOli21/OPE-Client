@@ -32,7 +32,7 @@ export default new Router({
       beforeEnter: (to, from, next) => {
         const userData = JSON.parse(localStorage.getItem('userData'));
         if(userData && userData.isStudent && !userData.groupId) return next()
-        next('/')           
+        next('/')
       }
     },
     {
@@ -42,7 +42,7 @@ export default new Router({
       beforeEnter: (to, from, next) => {
         const userData = JSON.parse(localStorage.getItem('userData'));
         if(userData && userData.isStudent && userData.groupId) return next()
-        next('/')        
+        next('/')
       }
     },
     {
@@ -52,14 +52,14 @@ export default new Router({
       beforeEnter: (to, from, next) => {
         const userData = JSON.parse(localStorage.getItem('userData'));
         if(userData && !userData.isStudent) return next()
-        next('/')        
+        next('/')
       }
     },
     {
       path: "*",
       beforeEnter: (to, from, next) => {
         if(localStorage.getItem('userData')) return next('/escolhe-grupo')
-        next('/')        
+        next('/')
       }
     }
   ]

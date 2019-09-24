@@ -1,22 +1,17 @@
 <template>
-  <v-flex xs12 sm12 md12 lg12>
-    <v-row align="center" justify="center">
-      <loading :active.sync="visible" :is-full-page="fullPage"></loading>
-    </v-row>
-  </v-flex>
+  <v-row justify="center" align="center" style="height:500px">
+    <div class="text-center">
+      <v-progress-circular indeterminate="false" size="150" width="5" color="light-blue">
+        Loading
+      </v-progress-circular>
+    </div>
+  </v-row>
 </template>
 
 <script>
 import * as Login from "@/services/authGoogle.js";
-import Loading from "vue-loading-overlay"
 export default {
   name: "handleRouter",
-  data() {
-    return {
-      visible: true,
-      fullPage: true
-    }
-  },
   async beforeCreate() {
     try {
       const code = window.location.href.split("code=")[1];
