@@ -2,7 +2,7 @@
   <v-menu offset-y open-on-hover>
     <template v-slot:activator="{on}">
       <v-btn fab small text dark slot="activator" v-on="on" @click="drawer = !drawer" style="width: 150px !important">
-        <v-icon small>{{user.username}}</v-icon>
+        {{user.username}}
       </v-btn>
     </template>
 
