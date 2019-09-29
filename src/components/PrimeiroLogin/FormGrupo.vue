@@ -9,30 +9,43 @@
         <v-card-title class="pt-7 ml-3">Criar um grupo</v-card-title>
         <v-card-text>
           <v-form class="px-3 pt-5">
-            <v-text-field outlined label="Nome do grupo" v-model="groupName" prepend-icon="group"></v-text-field>
+            <v-text-field
+              outlined
+              label="Nome do grupo"
+              prepend-icon="group"
+              v-model="groupName"
+              required
+              :rules="[() => groupName.length > 0 || 'Campo obrigatório']"
+            ></v-text-field>
             <v-text-field
               outlined
               label="Nome do projeto"
-              v-model="projectName"
               prepend-icon="folder"
+              v-model="projectName"
+              required
+              :rules="[() => projectName.length > 0 || 'Campo obrigatório']"
             ></v-text-field>
             <v-text-field
               outlined
               label="Nome do cliente"
-              v-model="customerName"
               prepend-icon="work"
+              v-model="customerName"
+              required
+              :rules="[() => customerName.length > 0 || 'Campo obrigatório']"
             ></v-text-field>
             <v-textarea
               outlined
               label="Descrição do projeto"
               height="100"
-              v-model="description"
               prepend-icon="edit"
+              v-model="description"
+              required
+              :rules="[() => description.length > 0 || 'Campo obrigatório']"
             ></v-textarea>
             <div class="flex-grow-1"></div>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn depressed outlined dark color="indigo darken-1" @click="dialog">Fechar</v-btn>
+              <v-btn depressed outlined dark color="indigo darken-1" @click="dialog=false">Fechar</v-btn>
 
               <v-btn
                 depressed
@@ -65,14 +78,41 @@ export default {
       customerName: "",
       description: "",
       pcsta,
-      email
+      owner: email
     };
   },
   methods: {
     async create() {
-      const group = this.$data;
-      delete group.dialog
-      await createGroup(group);
+      try {
+        const dataObject = this.$data;
+        const fields = Object.keys(this.$data);
+        const someFieldVoid = fields.find(field => {
+          if (!dataObject[field].length && field !== "dialog") return field;
+        });
+        if (someFieldVoid) {
+          return this.$swal("Por favor, preencha todos os campos.");
+        } else {
+          const response = await createGroup({
+            group: {
+              groupName: dataObject.groupName,
+              projectName: dataObject.projectName,
+              customerName: dataObject.customerName,
+              description: dataObject.description,
+              owner: dataObject.owner
+            },
+            pcsta: dataObject.pcsta
+          });
+          if (response.status !== 200) {
+            return this.$swal(
+              "Tivemos um problema com o nosso servidor, por favor tente novamente mais tarde."
+            );
+          }
+        }
+      } catch (err) {
+        return this.$swal(
+          "No momento ainda não conseguimos fazer requisição."
+        );
+      }
     }
   }
 };
