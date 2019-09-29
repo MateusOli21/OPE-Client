@@ -1,9 +1,16 @@
 <template>
   <v-menu offset-y open-on-hover>
     <template v-slot:activator="{on}">
-      <v-btn fab small text dark slot="activator" v-on="on" @click="drawer = !drawer" style="width: 150px !important">
-        {{user.username}}
-      </v-btn>
+      <v-btn
+        fab
+        small
+        text
+        dark
+        slot="activator"
+        v-on="on"
+        @click="drawer = !drawer"
+        style="width: 150px !important"
+      >{{user.username}}</v-btn>
     </template>
 
     <v-card width="300">
@@ -64,6 +71,8 @@
 </template>
 
 <script>
+import * as Login from "@/services/authGoogle.js";
+
 export default {
   data() {
     return {
@@ -71,11 +80,7 @@ export default {
     };
   },
   methods: {
-    logout: function () {
-      localStorage.clear()
-      this.$router.push('/')
-      this.$router.go('/')
-    }
+    logout: Login.logout
   },
   created() {
     const user = JSON.parse(localStorage.getItem("userData"));

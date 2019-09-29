@@ -9,3 +9,18 @@ export const getUserData = code => {
     params: { code: decodeURIComponent(code) }
   });
 };
+
+export const logout = async function () {
+  try {
+    await http.get("/logout")
+    localStorage.clear()
+    this.$router.push('/')
+    this.$router.go('/')
+  } catch (err) {
+    this.$swal.fire({
+      type: "error",
+      title: "Erro",
+      text: err
+    });
+  }
+}

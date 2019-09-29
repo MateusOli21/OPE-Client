@@ -2,6 +2,9 @@ import Vue from "vue";
 import Router from "vue-router";
 import Home from "./views/Home.vue";
 import HandleRouter from "./views/handleRouter.vue";
+import { guestMiddleware } from "./middlewares/guestMiddleware"
+import { authMiddleware } from "./middlewares/authMiddleware"
+import { otherwiseMiddlware } from "./middlewares/otherwiseMiddleware"
 
 Vue.use(Router);
 
@@ -12,13 +15,7 @@ export default new Router({
       path: "/",
       name: "home",
       component: Home,
-      beforeEnter: (to, from, next) => {
-        const userData = JSON.parse(localStorage.getItem('userData'));
-        if(userData && userData.isStudent && !userData.groupId) return next('/escolhe-grupo')
-        if(userData && userData.isStudent && userData.groupId) return next('/grupo-aluno')
-        if(userData && !userData.isStudent) return next('/pagina-professor')
-        next()
-      }
+      beforeEnter: guestMiddleware
     },
     {
       path: "/callback",
@@ -29,38 +26,23 @@ export default new Router({
       path: "/escolhe-grupo",
       name: "escolheGrupo",
       component: () => import("./views/PrimeiroAcesso.vue"),
-      beforeEnter: (to, from, next) => {
-        const userData = JSON.parse(localStorage.getItem('userData'));
-        if(userData && userData.isStudent && !userData.groupId) return next()
-        next('/')
-      }
+      beforeEnter: authMiddleware
     },
     {
       path: "/grupo-aluno",
       name: "paginaGrupoAluno",
       component: ()=> import("./views/PaginaGrupoAluno.vue"),
-      beforeEnter: (to, from, next) => {
-        const userData = JSON.parse(localStorage.getItem('userData'));
-        if(userData && userData.isStudent && userData.groupId) return next()
-        next('/')
-      }
+      beforeEnter: authMiddleware
     },
     {
       path: "/pagina-professor",
       name: "paginaGrupoProfessor",
       component: ()=> import("./views/PaginaGrupoProfessor.vue"),
-      beforeEnter: (to, from, next) => {
-        const userData = JSON.parse(localStorage.getItem('userData'));
-        if(userData && !userData.isStudent) return next()
-        next('/')
-      }
+      beforeEnter: authMiddleware
     },
     {
       path: "*",
-      beforeEnter: (to, from, next) => {
-        if(localStorage.getItem('userData')) return next('/escolhe-grupo')
-        next('/')
-      }
+      beforeEnter: otherwiseMiddlware
     }
   ]
 });
