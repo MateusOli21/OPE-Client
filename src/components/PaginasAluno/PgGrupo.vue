@@ -7,11 +7,12 @@
         <h3>Cliente: {{group.customerName}}</h3>
         <v-switch
           v-model="switchOpen"
+          v-if="show"
           :label="`${switchOpen ? 'Fechar Grupo' : 'Abrir Grupo'}`"
           :change="updateOpenGroup"
           @change="updateOpenGroup"
         ></v-switch>
-        <div>
+        <div v-if="show">
           Código de acesso:
           <v-text-field
             outlined
@@ -21,7 +22,7 @@
             disabled
             readonly
           ></v-text-field>
-          <div class="my-2">
+          <div class="my-2" v-if="show">
             <v-btn color="warning" dark @click="generateNewEntranceCode">Gerar outro</v-btn>
           </div>
         </div>
@@ -65,6 +66,7 @@ export default {
   name: "pgGroup",
   data() {
     return {
+      show: false,
       dialog: false,
       user: "",
       members: [],
@@ -81,6 +83,7 @@ export default {
       this.members = members.data.members;
       const group = await getGroupById(user.groupId);
       this.group = group.data.group;
+      this.show = this.group.owner === user.email ? true : false;
     } catch (err) {
       this.$swal(`Algo deu errado:${JSON.stringify(err)}`);
     }
@@ -88,8 +91,12 @@ export default {
   methods: {
     async updateOpenGroup() {
       try {
-      this.group.isOpen = this.switchOpen;
-        const {data: {groupUpdated: {isOpen}}} = await updateOpenGroup(this.group);
+        this.group.isOpen = this.switchOpen;
+        const {
+          data: {
+            groupUpdated: { isOpen }
+          }
+        } = await updateOpenGroup(this.group);
       } catch (err) {
         this.$swal(err.message);
       }
