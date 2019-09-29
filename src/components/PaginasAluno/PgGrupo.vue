@@ -35,6 +35,11 @@
               <v-card-text v-for="(member, index) in members" v-bind:key="index">
                 <h5>Nome: {{ member.username }}</h5>
                 <h5>E-mail: {{ member.email }}</h5>
+                <div class="my-2" v-if="show && member.email !== group.owner">
+                  <v-btn color="error" fab x-small dark @click="kickFromGroup(member)">
+                    <v-icon>close</v-icon>
+                  </v-btn>
+                </div>
               </v-card-text>
             </v-card>
           </v-card>
@@ -59,7 +64,8 @@ import { getMembersByGroupId } from "../../services/AuthApi";
 import {
   getGroupById,
   updateOpenGroup,
-  getNewEntranceCode
+  getNewEntranceCode,
+  kickFromGroup
 } from "../../services/GroupApi";
 
 export default {
@@ -68,7 +74,7 @@ export default {
     return {
       show: false,
       dialog: false,
-      user: "",
+      user: JSON.parse(localStorage.getItem("userData")),
       members: [],
       member: "",
       group: {},
@@ -105,6 +111,14 @@ export default {
       try {
         const entranceCode = await getNewEntranceCode(this.group._id);
         this.group.entranceCode = entranceCode.data.groupUpdated.entranceCode;
+      } catch (err) {
+        this.$swal(err.message);
+      }
+    },
+    async kickFromGroup(member) {
+      try {
+        const entranceCode = await kickFromGroup(member.email);
+        this.members = this.members.filter(currentMember => currentMember.email !== member.email);
       } catch (err) {
         this.$swal(err.message);
       }

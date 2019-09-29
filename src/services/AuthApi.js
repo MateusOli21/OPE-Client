@@ -11,6 +11,12 @@ export const getUserData = code => {
   });
 };
 
+export const getUserByEmail = email => {
+  return axios.get(`${VUE_APP_AUTH_ENDPOINT}/getUserByEmail`, {
+    params: { email }
+  });
+};
+
 export const getMembersByGroupId = groupId => {
   return axios.get(`${VUE_APP_AUTH_ENDPOINT}/getMembersByGroupId`, {
     params: { groupId }

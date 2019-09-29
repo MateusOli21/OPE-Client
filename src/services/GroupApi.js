@@ -27,3 +27,7 @@ export const getNewEntranceCode = groupId => {
     params: { groupId }
   });
 };
+
+export const kickFromGroup = email => {
+  return axios.patch(`${VUE_APP_GROUP_ENDPOINT}/kickFromGroup`, { email });
+};
