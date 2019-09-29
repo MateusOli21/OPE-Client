@@ -39,6 +39,7 @@
 
 <script>
 import { sendEntranceCode } from "../../services/GroupApi";
+const { email } = JSON.parse(localStorage.getItem("userData"));
 
 export default {
   data() {
@@ -51,9 +52,13 @@ export default {
     async associate() {
       if (!this.$data.code.length)
         return this.$swal("Por favor, digite o código do grupo.");
-
       try {
-        await sendEntranceCode(this.$data.code);
+        const response = await sendEntranceCode(this.$data.code, email);
+        const userData = JSON.parse(localStorage.getItem("userData"));
+        userData.groupId = response.data.group._id;
+        localStorage.setItem("userData", JSON.stringify(userData));
+        this.$router.push("/grupo-aluno");
+        this.$router.go("/grupo-aluno");
       } catch (err) {
         this.$swal("Código inválido.");
       }

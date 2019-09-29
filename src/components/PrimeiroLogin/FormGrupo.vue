@@ -39,8 +39,6 @@
               height="100"
               prepend-icon="edit"
               v-model="description"
-              required
-              :rules="[() => description.length > 0 || 'Campo obrigatório']"
             ></v-textarea>
             <div class="flex-grow-1"></div>
             <v-card-actions>
@@ -87,7 +85,7 @@ export default {
         const dataObject = this.$data;
         const fields = Object.keys(this.$data);
         const someFieldVoid = fields.find(field => {
-          if (!dataObject[field].length && field !== "dialog") return field;
+          if (!dataObject[field].length && field !== "dialog" && field !== "description") return field;
         });
         if (someFieldVoid) {
           return this.$swal("Por favor, preencha todos os campos.");
@@ -102,15 +100,15 @@ export default {
             },
             pcsta: dataObject.pcsta
           });
-          if (response.status !== 200) {
-            return this.$swal(
-              "Tivemos um problema com o nosso servidor, por favor tente novamente mais tarde."
-            );
-          }
+          const userData = JSON.parse(localStorage.getItem("userData"))
+          userData.groupId = response.data.group._id
+          localStorage.setItem('userData', JSON.stringify(userData))
+          this.$router.push('/grupo-aluno')
+          this.$router.go('/grupo-aluno')
         }
       } catch (err) {
         return this.$swal(
-          "No momento ainda não conseguimos fazer requisição."
+          "Tivemos um problema com o nosso servidor, por favor tente novamente mais tarde."
         );
       }
     }

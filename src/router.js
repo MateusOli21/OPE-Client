@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Home from "./views/Home.vue";
-import HandleRouter from "./views/handleRouter.vue";
+import HandleRouter from "./views/HandleRouter.vue";
 import { guestMiddleware } from "./middlewares/guestMiddleware"
 import { authMiddleware } from "./middlewares/authMiddleware"
 import { otherwiseMiddlware } from "./middlewares/otherwiseMiddleware"
@@ -19,7 +19,7 @@ export default new Router({
     },
     {
       path: "/callback",
-      name: "handleRouter",
+      name: "HandleRouter",
       component: HandleRouter
     },
     {

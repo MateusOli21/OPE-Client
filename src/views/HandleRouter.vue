@@ -8,32 +8,32 @@
 
 <script>
 import * as Login from "@/services/AuthApi.js";
-import { constants } from "../helpers/constants";
 
 export default {
-  name: "handleRouter",
+  name: "HandleRouter",
   async beforeCreate() {
     try {
       // code is used for get data of user in googleapis
       const codeInUrl = window.location.href.split("code=")[1];
       const response = await Login.getUserData(codeInUrl);
-      if (response.status === constants.HTTP_CODE_SUCCESS) {
-        const {
-          data: { user }
-        } = response;
-        localStorage.setItem("userData", JSON.stringify(user));
-        return user.isStudent
-          ? user.groupId
-            ? this.$router.push("/grupo-aluno")
-            : this.$router.push("/escolhe-grupo")
-          : this.$router.push("/pagina-professor");
-      }
-      throw new Error();
+      const {
+        data: { user }
+      } = response;
+      localStorage.setItem("userData", JSON.stringify(user));
+      return user.isStudent
+        ? user.groupId
+          ? this.$router.push("/grupo-aluno")
+          : this.$router.push("/escolhe-grupo")
+        : this.$router.push("/pagina-professor");
     } catch (err) {
+      let text = "Ocorreu um erro em nosso servidor, pedimos desculpas.";
+      if (err.message.includes("403")) {
+        text = "Você não tem permissão para acessar essa aplicação.";
+      }
       this.$swal.fire({
         type: "error",
         title: "Erro",
-        text: "Você não tem permissão para acessar essa aplicação."
+        text
       });
       this.$router.push("/");
     }

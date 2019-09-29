@@ -11,6 +11,12 @@ export const getUserData = code => {
   });
 };
 
+export const getMembersByGroupId = groupId => {
+  return axios.get(`${VUE_APP_AUTH_ENDPOINT}/getMembersByGroupId`, {
+    params: { groupId }
+  });
+};
+
 export const logout = async function () {
   try {
     await axios.get(`${VUE_APP_AUTH_ENDPOINT}/logout`)
