@@ -1,18 +1,19 @@
-import { http } from "./config";
+import axios from "axios";
+const { VUE_APP_AUTH_ENDPOINT } = process.env;
 
 export const getGoogleURL = () => {
-  return http.get("/googleUrl");
+  return axios.get(`${VUE_APP_AUTH_ENDPOINT}/googleUrl`);
 };
 
 export const getUserData = code => {
-  return http.get("/callbackGoogle", {
+  return axios.get(`${VUE_APP_AUTH_ENDPOINT}/callbackGoogle`, {
     params: { code: decodeURIComponent(code) }
   });
 };
 
 export const logout = async function () {
   try {
-    await http.get("/logout")
+    await axios.get(`${VUE_APP_AUTH_ENDPOINT}/logout`)
     localStorage.clear()
     this.$router.push('/')
     this.$router.go('/')

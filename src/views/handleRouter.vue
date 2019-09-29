@@ -1,13 +1,13 @@
 <template>
   <v-row justify="center" align="center" style="height:500px">
     <div class="text-center">
-      <v-progress-circular indeterminate="false" size="150" width="5" color="light-blue">Loading</v-progress-circular>
+      <v-progress-circular indeterminate="false" size="150" width="5" color="light-blue">Carregando</v-progress-circular>
     </div>
   </v-row>
 </template>
 
 <script>
-import * as Login from "@/services/authGoogle.js";
+import * as Login from "@/services/AuthApi.js";
 import { constants } from "../helpers/constants";
 
 export default {

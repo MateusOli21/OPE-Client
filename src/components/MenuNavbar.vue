@@ -71,11 +71,12 @@
 </template>
 
 <script>
-import * as Login from "@/services/authGoogle.js";
+import * as Login from "@/services/AuthApi.js";
 
 export default {
   data() {
     return {
+      drawer: false,
       user: ""
     };
   },
