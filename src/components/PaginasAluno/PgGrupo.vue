@@ -25,6 +25,9 @@
           <div class="my-2" v-if="show">
             <v-btn color="warning" dark @click="generateNewEntranceCode">Gerar outro</v-btn>
           </div>
+          <v-btn color="error" @click="exitFromGroup" fab small dark>
+            <v-icon>mdi-account-arrow-right</v-icon>
+          </v-btn>Sair do grupo
         </div>
       </div>
       <v-layout row wrap>
@@ -65,7 +68,8 @@ import {
   getGroupById,
   updateOpenGroup,
   getNewEntranceCode,
-  kickFromGroup
+  kickFromGroup,
+  exitFromGroup
 } from "../../services/GroupApi";
 
 export default {
@@ -118,7 +122,20 @@ export default {
     async kickFromGroup(member) {
       try {
         const entranceCode = await kickFromGroup(member.email);
-        this.members = this.members.filter(currentMember => currentMember.email !== member.email);
+        this.members = this.members.filter(
+          currentMember => currentMember.email !== member.email
+        );
+      } catch (err) {
+        this.$swal(err.message);
+      }
+    },
+    async exitFromGroup() {
+      try {
+        const entranceCode = await exitFromGroup(this.user.email);
+        this.user.groupId = null
+        localStorage.setItem("userData", JSON.stringify(this.user))
+        this.$router.push("/escolhe-grupo")
+        this.$router.go("/escolhe-grupo")
       } catch (err) {
         this.$swal(err.message);
       }
