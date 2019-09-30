@@ -7,8 +7,8 @@
 </template>
 
 <script>
-import * as Login from "@/services/authGoogle.js";
-import { constants } from "../helpers/constants";
+/* eslint-disable */
+import * as Login from "../services/AuthApi";
 
 export default {
   name: "handleRouter",
@@ -17,18 +17,31 @@ export default {
       // code is used for get data of user in googleapis
       const codeInUrl = window.location.href.split("code=")[1];
       const response = await Login.getUserData(codeInUrl);
-      if (response.status === constants.HTTP_CODE_SUCCESS) {
+      if (response.status === 200) {
         const {
           data: { user }
         } = response;
-        localStorage.setItem("userData", JSON.stringify(user));
-        return user.isStudent
-          ? user.groupId
-            ? this.$router.push("/grupo-aluno")
-            : this.$router.push("/escolhe-grupo")
-          : this.$router.push("/pagina-professor");
+        if (user) {
+          let path = "/";
+          localStorage.setItem("userData", JSON.stringify(user));
+          if (user.isStudent && user.groupId) {
+            path = "/grupo-aluno";
+          } else if (user.isStudent && !user.groupId) {
+            path = "/escolhe-grupo";
+          } else if (!user.isStudent) {
+            path = "/pagina-professor";
+          }
+          return this.$router.push(path);
+        } else {
+          this.$swal.fire({
+            type: "error",
+            title: "Erro",
+            text:
+              "Não foi possível se conectar a sua conta Google, por favor, tente novamente mais tarde."
+          });
+          return this.$router.push("/");
+        }
       }
-      throw new Error();
     } catch (err) {
       this.$swal.fire({
         type: "error",
