@@ -28,11 +28,14 @@
             <v-card-title>Integrantes</v-card-title>
             <v-card height="200px" class="scroll">
               <v-card-text v-for="(member, index) in members" v-bind:key="index">
-                <h5>Nome: {{ member.username }}</h5>
+                <h5>Nome: {{ member.username }}<v-icon v-if="member.email === group.owner" x-small>mdi-star</v-icon></h5>
                 <h5>E-mail: {{ member.email }}</h5>
                 <div class="my-2" v-if="show && member.email !== group.owner">
                   <v-btn color="error" fab x-small dark @click="kickFromGroup(member)">
                     <v-icon>close</v-icon>
+                  </v-btn>
+                  <v-btn color="primary" fab x-small dark @click="passOwner(member.email)">
+                    <v-icon>mdi-star</v-icon>
                   </v-btn>
                 </div>
               </v-card-text>
@@ -91,23 +94,23 @@ export default {
       ]);
       this.members = members;
       this.group = group;
-      this.switchOpen = group.isOpen
+      this.switchOpen = group.isOpen;
       this.show = this.group.owner === email ? true : false;
     } catch (err) {
-        this.$swal.fire({
-          type: "error",
-          title: "Erro",
-          text: err.message
-        });
+      this.$swal.fire({
+        type: "error",
+        title: "Erro",
+        text: err.message
+      });
     }
   },
   methods: {
     async updateOpenGroup(bool) {
       try {
         this.group.isOpen = bool;
-        const { status } = await updateOpenGroup(this.group);
+        await updateOpenGroup(this.group);
       } catch (err) {
-        this.switchOpen = !bool
+        this.switchOpen = !bool;
         this.$swal.fire({
           type: "error",
           title: "Erro",
@@ -143,11 +146,27 @@ export default {
     },
     async exitFromGroup() {
       try {
-        const entranceCode = await exitFromGroup(this.user.email, this.user.groupId);
+        const entranceCode = await exitFromGroup(
+          this.user.email,
+          this.user.groupId
+        );
         this.user.groupId = null;
         localStorage.setItem("userData", JSON.stringify(this.user));
         this.$router.push("/escolhe-grupo");
         this.$router.go("/escolhe-grupo");
+      } catch (err) {
+        this.$swal.fire({
+          type: "error",
+          title: "Erro",
+          text: err.message
+        });
+      }
+    },
+    async passOwner(newOwnerEmail) {
+      try {
+        this.group.owner = newOwnerEmail;
+        const { data: { group } } = await updateOpenGroup(this.group);
+        this.show = false
       } catch (err) {
         this.$swal.fire({
           type: "error",
