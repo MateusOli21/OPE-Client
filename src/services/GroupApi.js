@@ -32,6 +32,6 @@ export const kickFromGroup = email => {
   return axios.patch(`${VUE_APP_GROUP_ENDPOINT}/kickFromGroup`, { email });
 };
 
-export const exitFromGroup = email => {
-  return axios.patch(`${VUE_APP_GROUP_ENDPOINT}/exitFromGroup`, { email });
+export const exitFromGroup = (email, groupId) => {
+  return axios.patch(`${VUE_APP_GROUP_ENDPOINT}/exitFromGroup`, { email, groupId });
 };
