@@ -6,29 +6,21 @@
         <h3>Projeto: {{group.projectName}}</h3>
         <h3>Cliente: {{group.customerName}}</h3>
         <v-switch
-          v-model="switchOpen"
           v-if="show"
+          v-model="switchOpen"
           :label="`${switchOpen ? 'Fechar Grupo' : 'Abrir Grupo'}`"
-          :change="updateOpenGroup"
           @change="updateOpenGroup"
         ></v-switch>
         <div v-if="show">
           Código de acesso:
-          <v-text-field
-            outlined
-            :label="group.entranceCode"
-            prepend-icon="lock"
-            style="width: 20% !important;"
-            disabled
-            readonly
-          ></v-text-field>
+          <span v-text="group.entranceCode"></span>
           <div class="my-2" v-if="show">
             <v-btn color="warning" dark @click="generateNewEntranceCode">Gerar outro</v-btn>
           </div>
-          <v-btn color="error" @click="exitFromGroup" fab small dark>
-            <v-icon>mdi-account-arrow-right</v-icon>
-          </v-btn>Sair do grupo
         </div>
+        <v-btn color="error" @click="exitFromGroup" fab small dark>
+          <v-icon>mdi-account-arrow-right</v-icon>
+        </v-btn>Sair do grupo
       </div>
       <v-layout row wrap>
         <v-flex xs12 sm12 md6 lg6>
@@ -73,42 +65,54 @@ import {
 } from "../../services/GroupApi";
 
 export default {
-  name: "pgGroup",
+  name: "StudentWithGroup",
   data() {
     return {
-      show: false,
-      dialog: false,
       user: JSON.parse(localStorage.getItem("userData")),
       members: [],
-      member: "",
       group: {},
-      switchOpen: true
+      switchOpen: true,
+      show: false
     };
   },
   async beforeCreate() {
-    const user = JSON.parse(localStorage.getItem("userData"));
-    this.user = user;
     try {
-      const members = await getMembersByGroupId(user.groupId);
-      this.members = members.data.members;
-      const group = await getGroupById(user.groupId);
-      this.group = group.data.group;
-      this.show = this.group.owner === user.email ? true : false;
+      const { groupId, email } = JSON.parse(localStorage.getItem("userData"));
+      const [
+        {
+          data: { members }
+        },
+        {
+          data: { group }
+        }
+      ] = await Promise.all([
+        getMembersByGroupId(groupId),
+        getGroupById(groupId)
+      ]);
+      this.members = members;
+      this.group = group;
+      this.switchOpen = group.isOpen
+      this.show = this.group.owner === email ? true : false;
     } catch (err) {
-      this.$swal(`Algo deu errado:${JSON.stringify(err)}`);
+        this.$swal.fire({
+          type: "error",
+          title: "Erro",
+          text: err.message
+        });
     }
   },
   methods: {
-    async updateOpenGroup() {
+    async updateOpenGroup(bool) {
       try {
-        this.group.isOpen = this.switchOpen;
-        const {
-          data: {
-            groupUpdated: { isOpen }
-          }
-        } = await updateOpenGroup(this.group);
+        this.group.isOpen = bool;
+        const { status } = await updateOpenGroup(this.group);
       } catch (err) {
-        this.$swal(err.message);
+        this.switchOpen = !bool
+        this.$swal.fire({
+          type: "error",
+          title: "Erro",
+          text: err.message
+        });
       }
     },
     async generateNewEntranceCode() {
@@ -116,7 +120,11 @@ export default {
         const entranceCode = await getNewEntranceCode(this.group._id);
         this.group.entranceCode = entranceCode.data.groupUpdated.entranceCode;
       } catch (err) {
-        this.$swal(err.message);
+        this.$swal.fire({
+          type: "error",
+          title: "Erro",
+          text: err.message
+        });
       }
     },
     async kickFromGroup(member) {
@@ -126,18 +134,26 @@ export default {
           currentMember => currentMember.email !== member.email
         );
       } catch (err) {
-        this.$swal(err.message);
+        this.$swal.fire({
+          type: "error",
+          title: "Erro",
+          text: err.message
+        });
       }
     },
     async exitFromGroup() {
       try {
-        const entranceCode = await exitFromGroup(this.user.email);
-        this.user.groupId = null
-        localStorage.setItem("userData", JSON.stringify(this.user))
-        this.$router.push("/escolhe-grupo")
-        this.$router.go("/escolhe-grupo")
+        const entranceCode = await exitFromGroup(this.user.email, this.user.groupId);
+        this.user.groupId = null;
+        localStorage.setItem("userData", JSON.stringify(this.user));
+        this.$router.push("/escolhe-grupo");
+        this.$router.go("/escolhe-grupo");
       } catch (err) {
-        this.$swal(err.message);
+        this.$swal.fire({
+          type: "error",
+          title: "Erro",
+          text: err.message
+        });
       }
     }
   }
