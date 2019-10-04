@@ -1,26 +1,28 @@
 <template>
   <div class="descricao-projeto">
     <v-container grid-list-md text-xs-center>
+      <div class="switch">
+        <v-btn color="error" @click="exitFromGroup" fab small dark>
+          <v-icon>mdi-account-arrow-right</v-icon>
+        </v-btn>
+      </div>
+      <h1 align="center">{{group.groupName}}</h1>
       <div align="left">
-        <h1 align="center">{{group.groupName}}</h1>
         <h3>Projeto: {{group.projectName}}</h3>
         <h3>Cliente: {{group.customerName}}</h3>
         <v-switch
           v-if="show"
+          class="switch"
           v-model="switchOpen"
           :label="`${switchOpen ? 'Fechar Grupo' : 'Abrir Grupo'}`"
           @change="updateOpenGroup"
         ></v-switch>
-        <div v-if="show">
-          Código de acesso:
-          <span v-text="group.entranceCode"></span>
-          <div class="my-2" v-if="show">
-            <v-btn color="warning" dark @click="generateNewEntranceCode">Gerar outro</v-btn>
-          </div>
+
+        <div v-if="show" class="entrance-code">
+          <v-btn color="warning" dark @click="generateNewEntranceCode">Gerar outro</v-btn>
+          <span class="text-code">&nbsp; Código de entrada:</span><span v-text="group.entranceCode"></span>
         </div>
-        <v-btn color="error" @click="exitFromGroup" fab small dark>
-          <v-icon>mdi-account-arrow-right</v-icon>
-        </v-btn>Sair do grupo
+        <br>
       </div>
       <v-layout row wrap>
         <v-flex xs12 sm12 md6 lg6>
@@ -28,7 +30,10 @@
             <v-card-title>Integrantes</v-card-title>
             <v-card height="200px" class="scroll">
               <v-card-text v-for="(member, index) in members" v-bind:key="index">
-                <h5>Nome: {{ member.username }}<v-icon v-if="member.email === group.owner" x-small>mdi-star</v-icon></h5>
+                <h5>
+                  Nome: {{ member.username }}
+                  <v-icon v-if="member.email === group.owner" x-small>mdi-star</v-icon>
+                </h5>
                 <h5>E-mail: {{ member.email }}</h5>
                 <div class="my-2" v-if="show && member.email !== group.owner">
                   <v-btn color="error" fab x-small dark @click="kickFromGroup(member)">
@@ -165,8 +170,10 @@ export default {
     async passOwner(newOwnerEmail) {
       try {
         this.group.owner = newOwnerEmail;
-        const { data: { group } } = await updateOpenGroup(this.group);
-        this.show = false
+        const {
+          data: { group }
+        } = await updateOpenGroup(this.group);
+        this.show = false;
       } catch (err) {
         this.$swal.fire({
           type: "error",
@@ -182,5 +189,18 @@ export default {
 <style scoped>
 .scroll {
   overflow-y: auto;
+}
+.switch {
+  display: flex;
+  justify-content: flex-end;
+}
+.entrance-code {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.text-code {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
 }
 </style>
