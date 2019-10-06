@@ -6,10 +6,8 @@ export const createGroup = group => {
   return axios.post(`${VUE_APP_GROUP_ENDPOINT}/createGroup`, group);
 };
 
-export const sendEntranceCode = (entranceCode, email) => {
-  return axios.get(`${VUE_APP_GROUP_ENDPOINT}/joinGroupByCode`, {
-    params: { entranceCode, email }
-  });
+export const joinGroupByCode = (entranceCode, email) => {
+  return axios.post(`${VUE_APP_GROUP_ENDPOINT}/joinGroupByCode`, { entranceCode, email });
 };
 
 export const getGroupById = groupId => {

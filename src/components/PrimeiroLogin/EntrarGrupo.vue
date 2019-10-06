@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import { sendEntranceCode } from "../../services/GroupApi";
+import { joinGroupByCode } from "../../services/GroupApi";
 const { email } = JSON.parse(localStorage.getItem("userData"));
 
 export default {
@@ -53,7 +53,7 @@ export default {
       if (!this.$data.code.length)
         return this.$swal("Por favor, digite o código do grupo.");
       try {
-        const response = await sendEntranceCode(this.$data.code, email);
+        const response = await joinGroupByCode(this.$data.code, email);
         const userData = JSON.parse(localStorage.getItem("userData"));
         userData.groupId = response.data.group._id;
         localStorage.setItem("userData", JSON.stringify(userData));
