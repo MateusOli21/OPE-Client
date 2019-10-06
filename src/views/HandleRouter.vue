@@ -8,7 +8,7 @@
 
 <script>
 /* eslint-disable */
-import * as Login from "../services/AuthApi";
+import { getUserData } from "../services/AuthApi";
 
 export default {
   name: "handleRouter",
@@ -16,33 +16,36 @@ export default {
     try {
       // code is used for get data of user in googleapis
       const codeInUrl = window.location.href.split("code=")[1];
-      const response = await Login.getUserData(codeInUrl);
-      if (response.status === 200) {
-        const {
-          data: { user }
-        } = response;
-        if (user) {
-          let path = "/";
-          localStorage.setItem("userData", JSON.stringify(user));
-          if (user.isStudent && user.groupId) {
-            path = "/grupo-aluno";
-          } else if (user.isStudent && !user.groupId) {
-            path = "/escolhe-grupo";
-          } else if (!user.isStudent) {
-            path = "/pagina-professor";
-          }
-          return this.$router.push(path);
-        } else {
-          this.$swal.fire({
-            type: "error",
-            title: "Erro",
-            text:
-              "Não foi possível se conectar a sua conta Google, por favor, tente novamente mais tarde."
-          });
-          return this.$router.push("/");
+      if (!localStorage.getItem("code")) {
+        localStorage.setItem("code", codeInUrl);
+        const response = await getUserData(codeInUrl);
+        localStorage.setItem("response", JSON.stringify(response.data.user));
+      }
+      const user = JSON.parse(localStorage.getItem("response"));
+      if (user && user.email) {
+        let path = "/";
+        localStorage.setItem("userData", JSON.stringify(user));
+        if (user.isStudent && user.groupId) {
+          path = "/grupo-aluno";
+        } else if (user.isStudent && !user.groupId) {
+          path = "/escolhe-grupo";
+        } else if (!user.isStudent) {
+          path = "/pagina-professor";
         }
+        return this.$router.push(path);
+      } else {
+        localStorage.clear();
+        this.$swal.fire({
+          type: "error",
+          title: "Erro",
+          text:
+            "Não foi possível se conectar a sua conta Google, por favor, tente novamente mais tarde."
+        });
+        return this.$router.push("/");
       }
     } catch (err) {
+      console.log("err:", err);
+      localStorage.clear();
       this.$swal.fire({
         type: "error",
         title: "Erro",
