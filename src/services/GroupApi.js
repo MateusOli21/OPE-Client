@@ -33,3 +33,13 @@ export const kickFromGroup = email => {
 export const exitFromGroup = (email, groupId) => {
   return axios.patch(`${VUE_APP_GROUP_ENDPOINT}/exitFromGroup`, { email, groupId });
 };
+
+export const getAllPcsta = () => {
+  return axios.get(`${VUE_APP_GROUP_ENDPOINT}/getAllPcsta`)
+}
+
+export const getGroups = pcsta => {
+  return axios.get(`${VUE_APP_GROUP_ENDPOINT}/getGroups`, {
+    params: { pcsta }
+  })
+}
