@@ -41,6 +41,11 @@ export default new Router({
       beforeEnter: authMiddleware
     },
     {
+      path: "/detalhes-grupo",
+      name: "groupDetails",
+      component: ()=> import("./views/DetailsGroupPage.vue")
+    },
+    {
       path: "*",
       beforeEnter: otherwiseMiddlware
     }
