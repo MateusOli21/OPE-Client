@@ -84,7 +84,7 @@ export default {
     logout: Login.logout
   },
   created() {
-    const user = JSON.parse(localStorage.getItem("userData"));
+    const user = JSON.parse(localStorage.getItem("googleUserData"));
     this.user = user;
   }
 };

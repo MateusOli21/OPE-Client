@@ -67,7 +67,7 @@ import { createGroup } from "../../services/GroupApi";
 
 export default {
   data() {
-    const { pcsta, email } = JSON.parse(localStorage.getItem("userData"));
+    const { pcsta, email } = JSON.parse(localStorage.getItem("googleUserData"));
 
     return {
       dialog: false,
@@ -85,7 +85,12 @@ export default {
         const dataObject = this.$data;
         const fields = Object.keys(this.$data);
         const someFieldVoid = fields.find(field => {
-          if (!dataObject[field].length && field !== "dialog" && field !== "description") return field;
+          if (
+            !dataObject[field].length &&
+            field !== "dialog" &&
+            field !== "description"
+          )
+            return field;
         });
         if (someFieldVoid) {
           return this.$swal("Por favor, preencha todos os campos.");
@@ -100,11 +105,11 @@ export default {
             },
             pcsta: dataObject.pcsta
           });
-          const userData = JSON.parse(localStorage.getItem("userData"))
-          userData.groupId = response.data.group._id
-          localStorage.setItem('userData', JSON.stringify(userData))
-          this.$router.push('/grupo-aluno')
-          this.$router.go('/grupo-aluno')
+          const userData = JSON.parse(localStorage.getItem("googleUserData"));
+          userData.groupId = response.data.group._id;
+          localStorage.setItem("googleUserData", JSON.stringify(userData));
+          this.$router.push("/grupo-aluno");
+          this.$router.go("/grupo-aluno");
         }
       } catch (err) {
         return this.$swal(

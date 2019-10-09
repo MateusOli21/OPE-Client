@@ -39,7 +39,7 @@
 
 <script>
 import { joinGroupByCode } from "../../services/GroupApi";
-const { email } = JSON.parse(localStorage.getItem("userData"));
+const { email } = JSON.parse(localStorage.getItem("googleUserData"));
 
 export default {
   data() {
@@ -54,7 +54,7 @@ export default {
         return this.$swal("Por favor, digite o código do grupo.");
       try {
         const response = await joinGroupByCode(this.$data.code, email);
-        const userData = JSON.parse(localStorage.getItem("userData"));
+        const userData = JSON.parse(localStorage.getItem("googleUserData"));
         userData.groupId = response.data.group._id;
         localStorage.setItem("userData", JSON.stringify(userData));
         this.$router.push("/grupo-aluno");

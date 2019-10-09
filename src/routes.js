@@ -1,10 +1,10 @@
 import Vue from "vue";
 import Router from "vue-router";
-import Home from "./views/Home.vue";
-import HandleRouter from "./views/HandleRouter.vue";
-import { guestMiddleware } from "./middlewares/guestMiddleware"
-import { authMiddleware } from "./middlewares/authMiddleware"
-import { otherwiseMiddlware } from "./middlewares/otherwiseMiddleware"
+import LoginPage from "./views/LoginPage.vue";
+import RedirectorLoaderPage from "./views/RedirectorLoaderPage.vue";
+import { guestMiddleware } from "./middlewares/guestMiddleware";
+import { authMiddleware } from "./middlewares/authMiddleware";
+import { otherwiseMiddlware } from "./middlewares/otherwiseMiddleware";
 
 Vue.use(Router);
 
@@ -13,14 +13,14 @@ export default new Router({
   routes: [
     {
       path: "/",
-      name: "home",
-      component: Home,
+      name: "LoginPage",
+      component: LoginPage,
       beforeEnter: guestMiddleware
     },
     {
       path: "/callback",
-      name: "HandleRouter",
-      component: HandleRouter
+      name: "RedirectorLoaderPage",
+      component: RedirectorLoaderPage
     },
     {
       path: "/escolhe-grupo",
@@ -31,19 +31,19 @@ export default new Router({
     {
       path: "/grupo-aluno",
       name: "paginaGrupoAluno",
-      component: ()=> import("./views/PaginaGrupoAluno.vue"),
+      component: () => import("./views/PaginaGrupoAluno.vue"),
       beforeEnter: authMiddleware
     },
     {
       path: "/pagina-professor",
       name: "paginaGrupoProfessor",
-      component: ()=> import("./views/PaginaGrupoProfessor.vue"),
+      component: () => import("./views/PaginaGrupoProfessor.vue"),
       beforeEnter: authMiddleware
     },
     {
       path: "/detalhes-grupo",
       name: "groupDetails",
-      component: ()=> import("./views/DetailsGroupPage.vue")
+      component: () => import("./views/DetailsGroupPage.vue")
     },
     {
       path: "*",

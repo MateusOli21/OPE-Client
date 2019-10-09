@@ -57,7 +57,7 @@ export default {
   name: "StudentWithGroup",
   data() {
     return {
-      user: JSON.parse(localStorage.getItem("userData")),
+      user: JSON.parse(localStorage.getItem("googleUserData")),
       members: [],
       group: {}
     };

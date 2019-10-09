@@ -5,7 +5,7 @@ export const getGoogleURL = () => {
   return axios.get(`${VUE_APP_AUTH_ENDPOINT}/googleUrl`);
 };
 
-export const getUserData = code => {
+export const getGoogleUserData = code => {
   return axios.get(`${VUE_APP_AUTH_ENDPOINT}/callbackGoogle`, {
     params: { code: decodeURIComponent(code) }
   });
@@ -23,12 +23,12 @@ export const getMembersByGroupId = groupId => {
   });
 };
 
-export const logout = async function () {
+export const logout = async function() {
   try {
-    await axios.get(`${VUE_APP_AUTH_ENDPOINT}/logout`)
-    localStorage.clear()
-    this.$router.push('/')
-    this.$router.go('/')
+    await axios.get(`${VUE_APP_AUTH_ENDPOINT}/logout`);
+    localStorage.clear();
+    this.$router.push("/");
+    this.$router.go("/");
   } catch (err) {
     this.$swal.fire({
       type: "error",
@@ -36,4 +36,4 @@ export const logout = async function () {
       text: err
     });
   }
-}
+};

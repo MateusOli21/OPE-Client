@@ -77,7 +77,7 @@ export default {
   name: "StudentWithGroup",
   data() {
     return {
-      user: JSON.parse(localStorage.getItem("userData")),
+      user: JSON.parse(localStorage.getItem("googleUserData")),
       members: [],
       group: {},
       switchOpen: true,
@@ -86,7 +86,9 @@ export default {
   },
   async beforeCreate() {
     try {
-      const { groupId, email } = JSON.parse(localStorage.getItem("userData"));
+      const { groupId, email } = JSON.parse(
+        localStorage.getItem("googleUserData")
+      );
       const [
         {
           data: { members }
@@ -157,7 +159,7 @@ export default {
           this.user.groupId
         );
         this.user.groupId = null;
-        localStorage.setItem("userData", JSON.stringify(this.user));
+        localStorage.setItem("googleUserData", JSON.stringify(this.user));
         this.$router.push("/escolhe-grupo");
         this.$router.go("/escolhe-grupo");
       } catch (err) {
