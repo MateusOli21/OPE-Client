@@ -63,8 +63,8 @@
 </template>
 
 <script>
-/* eslint-disable */
 import { getMembersByGroupId } from "../../services/AuthApi";
+import { getGoogleUserData, setObject } from "../../services/LocalStorage";
 import {
   getGroupById,
   updateOpenGroup,
@@ -77,7 +77,7 @@ export default {
   name: "StudentWithGroup",
   data() {
     return {
-      user: JSON.parse(localStorage.getItem("googleUserData")),
+      user: getGoogleUserData(),
       members: [],
       group: {},
       switchOpen: true,
@@ -86,9 +86,7 @@ export default {
   },
   async beforeCreate() {
     try {
-      const { groupId, email } = JSON.parse(
-        localStorage.getItem("googleUserData")
-      );
+      const { groupId, email } = getGoogleUserData();
       const [
         {
           data: { members }
@@ -140,7 +138,7 @@ export default {
     },
     async kickFromGroup(member) {
       try {
-        const entranceCode = await kickFromGroup(member.email);
+        await kickFromGroup(member.email);
         this.members = this.members.filter(
           currentMember => currentMember.email !== member.email
         );
@@ -154,12 +152,9 @@ export default {
     },
     async exitFromGroup() {
       try {
-        const entranceCode = await exitFromGroup(
-          this.user.email,
-          this.user.groupId
-        );
+        await exitFromGroup(this.user.email, this.user.groupId);
         this.user.groupId = null;
-        localStorage.setItem("googleUserData", JSON.stringify(this.user));
+        setObject("googleUserData", this.user);
         this.$router.push("/escolhe-grupo");
         this.$router.go("/escolhe-grupo");
       } catch (err) {
@@ -174,9 +169,7 @@ export default {
       const oldOwner = this.group.owner;
       try {
         this.group.owner = newOwnerEmail;
-        const {
-          data: { group }
-        } = await updateOpenGroup(this.group);
+        await updateOpenGroup(this.group);
         this.show = false;
       } catch (err) {
         this.group.owner = oldOwner;

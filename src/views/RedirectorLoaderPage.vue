@@ -11,7 +11,6 @@ import { getGoogleUserData } from "../services/AuthApi";
 import * as LocalStorage from "../services/LocalStorage";
 import { showError } from "../errors/sweetAlertError";
 
-const hasCodeInLocalStorage = LocalStorage.getItem("code");
 const setCodeInLocalStorage = code => LocalStorage.setItem("code", code);
 const storeGoogleUserData = googleUserData =>
   LocalStorage.setObject("googleUserData", googleUserData);
@@ -34,7 +33,7 @@ export default {
     try {
       const codeOfGoogleInUrl = window.location.href.split("code=")[1];
 
-      if (!hasCodeInLocalStorage) {
+      if (!LocalStorage.has("code")) {
         setCodeInLocalStorage(codeOfGoogleInUrl);
         const response = await getGoogleUserData(codeOfGoogleInUrl);
         googleUserData = response.data.user;

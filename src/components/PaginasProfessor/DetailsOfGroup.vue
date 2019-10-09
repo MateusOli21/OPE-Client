@@ -52,12 +52,13 @@ import {
   kickFromGroup,
   updateOpenGroup
 } from "../../services/GroupApi";
+import { getGoogleUserData } from "../../services/LocalStorage";
 
 export default {
   name: "StudentWithGroup",
   data() {
     return {
-      user: JSON.parse(localStorage.getItem("googleUserData")),
+      user: getGoogleUserData(),
       members: [],
       group: {}
     };

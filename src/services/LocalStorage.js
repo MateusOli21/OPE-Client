@@ -10,3 +10,6 @@ export const setObject = (key, object) =>
 export const has = key => localStorage.getItem(key);
 
 export const clearStorage = () => localStorage.clear();
+
+export const getGoogleUserData = () =>
+  JSON.parse(localStorage.getItem("googleUserData"));

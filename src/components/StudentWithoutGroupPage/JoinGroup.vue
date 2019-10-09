@@ -22,9 +22,8 @@
                 @click="dialog=false"
               >Fechar</v-btn>
               <v-btn
-                depressed
+                :disabled="hasNotCode"
                 outlined
-                dark
                 color="indigo darken-1"
                 class="mx-0 mt-3"
                 @click="associate"
@@ -39,28 +38,37 @@
 
 <script>
 import { joinGroupByCode } from "../../services/GroupApi";
-const { email } = JSON.parse(localStorage.getItem("googleUserData"));
+import { getGoogleUserData, setObject } from "../../services/LocalStorage";
+import { showError } from "../../errors/sweetAlertError";
+
+const updateUserGroupId = groupId => {
+  const googleUserData = getGoogleUserData();
+  googleUserData.groupId = groupId;
+  setObject("googleUserData", googleUserData);
+};
 
 export default {
   data() {
     return {
       dialog: false,
-      code: ""
+      code: "",
+      user: getGoogleUserData()
     };
+  },
+  computed: {
+    hasNotCode() {
+      return !this.code.length || !Number(this.code);
+    }
   },
   methods: {
     async associate() {
-      if (!this.$data.code.length)
-        return this.$swal("Por favor, digite o código do grupo.");
       try {
-        const response = await joinGroupByCode(this.$data.code, email);
-        const userData = JSON.parse(localStorage.getItem("googleUserData"));
-        userData.groupId = response.data.group._id;
-        localStorage.setItem("userData", JSON.stringify(userData));
+        const response = await joinGroupByCode(this.code, this.user.email);
+        updateUserGroupId(response.data.group._id);
         this.$router.push("/grupo-aluno");
-        this.$router.go("/grupo-aluno");
       } catch (err) {
-        this.$swal("Código inválido.");
+        const self = this;
+        showError(self, err, "Código Inválido.");
       }
     }
   }

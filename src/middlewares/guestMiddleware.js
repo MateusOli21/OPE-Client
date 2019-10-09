@@ -1,5 +1,7 @@
+import { getGoogleUserData } from "../services/LocalStorage";
+
 export const guestMiddleware = (to, from, next) => {
-  const userData = JSON.parse(localStorage.getItem("googleUserData"));
+  const userData = getGoogleUserData();
   if (userData && userData.isStudent && !userData.groupId)
     return next("/escolhe-grupo");
   if (userData && userData.isStudent && userData.groupId)

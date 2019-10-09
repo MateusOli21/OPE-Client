@@ -1,7 +1,8 @@
 import { getUserByEmail } from "../services/AuthApi";
+import { getGoogleUserData } from "../services/LocalStorage";
 
 export const authMiddleware = async (to, from, next) => {
-  const userData = JSON.parse(localStorage.getItem("googleUserData"));
+  const userData = getGoogleUserData();
   const groupDetail = localStorage.getItem("groupDetails");
   const {
     data: { user }
