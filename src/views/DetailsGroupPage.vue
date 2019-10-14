@@ -1,18 +1,18 @@
 <template>
   <div>
-    <MenuPrincipal/>
+    <MainMenu/>
     <DetailsOfGroup/>
   </div>
 </template>
 
 <script>
-import MenuPrincipal from '../components/MenuPrincipal'
-import DetailsOfGroup from '../components/PaginasProfessor/DetailsOfGroup'
+import MainMenu from '../components/MainMenu'
+import DetailsOfGroup from '../components/TeacherPage/DetailsOfGroup'
 
 
 export default {
   components:{
-    MenuPrincipal,
+    MainMenu,
     DetailsOfGroup
   }
 

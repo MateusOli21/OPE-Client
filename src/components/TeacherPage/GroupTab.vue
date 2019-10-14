@@ -7,7 +7,7 @@
             <v-card width="500px" max-height="550px" class="px-8 py-4">
               <v-card-title>Procure um grupo</v-card-title>
               <v-card-text>
-                <v-select :items="turmas" label="Turmas" v-model="classSelected"></v-select>
+                <v-select :items="courses" label="Turmas" v-model="classSelected"></v-select>
               </v-card-text>
               <v-card-actions>
                 <v-btn
@@ -36,11 +36,12 @@
 
 <script>
 import { getAllPcsta, getGroups } from "../../services/GroupApi";
+import { showError } from "../../errors/sweetAlertError"
 
 export default {
   data() {
     return {
-      turmas: [],
+      courses: [],
       classSelected: "",
       headers: [
         {
@@ -59,15 +60,14 @@ export default {
   async beforeCreate() {
     try {
       const pcstas = await getAllPcsta();
-      this.turmas = pcstas.data.pcstas.map(pcsta => pcsta.title);
+      this.courses = pcstas.data.pcstas.map(pcsta => pcsta.title);
     } catch (err) {
-      // eslint-disable-next-line
-      console.log("err:", err);
-      this.$swal.fire({
-        type: "error",
-        title: "Erro",
-        text: err.message
-      });
+        const self = this;
+        showError(
+          self,
+          err,
+          `Não foi possível obter o nome das turmas, por favor, tente novamente mais tarde.`
+        );
     }
   },
   methods: {

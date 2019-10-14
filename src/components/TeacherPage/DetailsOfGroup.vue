@@ -1,28 +1,10 @@
 <template>
   <div class="descricao-projeto">
     <v-container grid-list-md text-xs-center>
-      <div class="switch">
-        <v-btn color="error" @click="exitFromGroup" fab small dark>
-          <v-icon>mdi-account-arrow-right</v-icon>
-        </v-btn>
-      </div>
       <h1 align="center">{{group.groupName}}</h1>
       <div align="left">
         <h3>Projeto: {{group.projectName}}</h3>
         <h3>Cliente: {{group.customerName}}</h3>
-        <v-switch
-          v-if="show"
-          class="switch"
-          v-model="switchOpen"
-          :label="`${switchOpen ? 'Fechar Grupo' : 'Abrir Grupo'}`"
-          @change="updateOpenGroup"
-        ></v-switch>
-
-        <div v-if="show" class="entrance-code">
-          <v-btn color="warning" dark @click="generateNewEntranceCode">Gerar outro</v-btn>
-          <span class="text-code">&nbsp; Código de entrada:</span>
-          <span v-text="group.entranceCode"></span>
-        </div>
         <br />
       </div>
       <v-layout row wrap>
@@ -36,7 +18,7 @@
                   <v-icon v-if="member.email === group.owner" x-small>mdi-star</v-icon>
                 </h5>
                 <h5>E-mail: {{ member.email }}</h5>
-                <div class="my-2" v-if="show && member.email !== group.owner">
+                <div class="my-2">
                   <v-btn color="error" fab x-small dark @click="kickFromGroup(member)">
                     <v-icon>close</v-icon>
                   </v-btn>
@@ -67,26 +49,23 @@
 import { getMembersByGroupId } from "../../services/AuthApi";
 import {
   getGroupById,
-  updateOpenGroup,
-  getNewEntranceCode,
   kickFromGroup,
-  exitFromGroup
+  updateOpenGroup
 } from "../../services/GroupApi";
+import { getGoogleUserData } from "../../services/LocalStorage";
 
 export default {
   name: "StudentWithGroup",
   data() {
     return {
-      user: JSON.parse(localStorage.getItem("userData")),
+      user: getGoogleUserData(),
       members: [],
-      group: {},
-      switchOpen: true,
-      show: false
+      group: {}
     };
   },
   async beforeCreate() {
     try {
-      const { groupId, email } = JSON.parse(localStorage.getItem("userData"));
+      const groupId = localStorage.getItem("groupDetails");
       const [
         {
           data: { members }
@@ -100,8 +79,6 @@ export default {
       ]);
       this.members = members;
       this.group = group;
-      this.switchOpen = group.isOpen;
-      this.show = this.group.owner === email ? true : false;
     } catch (err) {
       this.$swal.fire({
         type: "error",
@@ -111,55 +88,12 @@ export default {
     }
   },
   methods: {
-    async updateOpenGroup(bool) {
-      try {
-        this.group.isOpen = bool;
-        await updateOpenGroup(this.group);
-      } catch (err) {
-        this.switchOpen = !bool;
-        this.$swal.fire({
-          type: "error",
-          title: "Erro",
-          text: err.message
-        });
-      }
-    },
-    async generateNewEntranceCode() {
-      try {
-        const entranceCode = await getNewEntranceCode(this.group._id);
-        this.group.entranceCode = entranceCode.data.groupUpdated.entranceCode;
-      } catch (err) {
-        this.$swal.fire({
-          type: "error",
-          title: "Erro",
-          text: err.message
-        });
-      }
-    },
     async kickFromGroup(member) {
       try {
         const entranceCode = await kickFromGroup(member.email);
         this.members = this.members.filter(
           currentMember => currentMember.email !== member.email
         );
-      } catch (err) {
-        this.$swal.fire({
-          type: "error",
-          title: "Erro",
-          text: err.message
-        });
-      }
-    },
-    async exitFromGroup() {
-      try {
-        const entranceCode = await exitFromGroup(
-          this.user.email,
-          this.user.groupId
-        );
-        this.user.groupId = null;
-        localStorage.setItem("userData", JSON.stringify(this.user));
-        this.$router.push("/escolhe-grupo");
-        this.$router.go("/escolhe-grupo");
       } catch (err) {
         this.$swal.fire({
           type: "error",

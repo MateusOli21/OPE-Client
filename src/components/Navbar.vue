@@ -1,44 +1,121 @@
 <template>
-     <nav>
-        <v-toolbar flat color="indigo darken-1" >
-            <v-toolbar-title class="text-uppercase white--text">
-                <router-link class="links" to="/">
-                    <v-img src="https://www.impacta.edu.br/themes/wc_agenciar3/images/logo-new.png" height="50" width="200"></v-img>
-                </router-link>
-            </v-toolbar-title>
+  <nav>
+    <v-toolbar flat color="indigo darken-1">
+      <v-toolbar-title class="text-uppercase white--text">
+        <v-img
+          src="https://www.impacta.edu.br/themes/wc_agenciar3/images/logo-new.png"
+          height="50"
+          width="200"
+        ></v-img>
+      </v-toolbar-title>
 
-            <v-spacer></v-spacer>
+      <v-spacer></v-spacer>
 
-            <MenuNavbar/>
+      <v-menu offset-y>
+        <template v-slot:activator="{on}">
+          <v-btn
+            fab
+            small
+            text
+            dark
+            slot="activator"
+            style="width: 150px !important"
+            v-on="on"
+          >{{user.username}}</v-btn>
+        </template>
 
-        </v-toolbar>
+        <v-card width="300">
+          <v-list>
+            <v-list-item class="avatar">
+              <v-avatar>
+                <v-img :src="user.avatar"></v-img>
+              </v-avatar>
+            </v-list-item>
 
-     </nav>
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title class="title pb-2">{{user.username}}</v-list-item-title>
+
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on: tooltip }">
+                    <v-list-item-subtitle v-on="{ ...tooltip}">{{user.email}}</v-list-item-subtitle>
+                  </template>
+                  <span>{{user.email}}</span>
+                </v-tooltip>
+
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on: tooltip }">
+                    <v-list-item-subtitle v-on="{ ...tooltip}">{{course}}</v-list-item-subtitle>
+                  </template>
+                  <span >{{course}}</span>
+                </v-tooltip>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+
+          <v-divider></v-divider>
+
+          <v-list nav dense>
+            <v-list-item link v-on:click="logout">
+              <v-list-item-icon>
+                <v-icon>exit_to_app</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title>Sair</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-card>
+      </v-menu>
+    </v-toolbar>
+  </nav>
 </template>
 
 <script>
-
-import MenuNavbar from '../components/MenuNavbar';
-
+import { logout } from "../services/AuthApi";
+import { getGoogleUserData, clearStorage } from "../services/LocalStorage";
+import { showError } from "../errors/sweetAlertError";
 
 export default {
-  name: 'Navbar',
-  components:{
-      MenuNavbar
+  data() {
+    return {
+      user: ""
+    };
   },
-  data(){
-      return{
-          drawer: false,
+  computed: {
+    course(){
+      return this.user.pcsta ? this.user.pcsta.split("- ")[1] : ""
+    }
+  },
+  methods: {
+    async logout() {
+      try {
+        await logout(this.user.email);
+        clearStorage();
+        this.$router.push("/");
+      } catch (err) {
+        const self = this;
+        showError(
+          self,
+          err,
+          "Não foi possível realizar Logout, por favor, tente novamente mais tarde."
+        );
       }
+    }
+  },
+  created() {
+    this.user = getGoogleUserData();
   }
-}
+};
 </script>
 
 <style scoped>
+.links {
+  color: white;
+  text-decoration: none;
+}
 
-.links{
-    color: white;
-    text-decoration: none;
+.avatar{
+  float: left;
+  padding-top: 15px;
 }
 </style>
 

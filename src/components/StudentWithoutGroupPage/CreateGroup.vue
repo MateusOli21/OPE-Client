@@ -46,11 +46,10 @@
               <v-btn depressed outlined dark color="indigo darken-1" @click="dialog=false">Fechar</v-btn>
 
               <v-btn
-                depressed
                 outlined
-                dark
                 color="indigo darken-1"
                 class="ml-3 px-4"
+                :disabled="requiredFieldsIsEmpty"
                 @click="create"
               >Criar</v-btn>
             </v-card-actions>
@@ -64,10 +63,18 @@
 
 <script>
 import { createGroup } from "../../services/GroupApi";
+import { getGoogleUserData, setObject } from "../../services/LocalStorage";
+import { showError } from "../../errors/sweetAlertError";
+
+const updateUserGroupId = groupId => {
+  const googleUserData = getGoogleUserData();
+  googleUserData.groupId = groupId;
+  setObject("googleUserData", googleUserData);
+};
 
 export default {
   data() {
-    const { pcsta, email } = JSON.parse(localStorage.getItem("userData"));
+    const googleUserData = getGoogleUserData();
 
     return {
       dialog: false,
@@ -75,40 +82,50 @@ export default {
       projectName: "",
       customerName: "",
       description: "",
-      pcsta,
-      owner: email
+      pcsta: googleUserData.pcsta,
+      owner: googleUserData.email,
+      courseId: googleUserData.courseId
     };
+  },
+  computed: {
+    requiredFieldsIsEmpty() {
+      const dataObject = this.$data;
+      const fields = Object.keys(this.$data);
+      const someFieldVoid = fields.find(field => {
+        if (
+          !dataObject[field].length &&
+          field !== "dialog" &&
+          field !== "description" &&
+          field !== "courseId"
+        )
+          return field;
+      });
+      if (someFieldVoid) return true;
+      return false;
+    }
   },
   methods: {
     async create() {
       try {
-        const dataObject = this.$data;
-        const fields = Object.keys(this.$data);
-        const someFieldVoid = fields.find(field => {
-          if (!dataObject[field].length && field !== "dialog" && field !== "description") return field;
+        const response = await createGroup({
+          group: {
+            groupName: this.groupName,
+            projectName: this.projectName,
+            customerName: this.customerName,
+            description: this.description,
+            owner: this.owner
+          },
+          pcsta: this.pcsta,
+          courseId: this.courseId
         });
-        if (someFieldVoid) {
-          return this.$swal("Por favor, preencha todos os campos.");
-        } else {
-          const response = await createGroup({
-            group: {
-              groupName: dataObject.groupName,
-              projectName: dataObject.projectName,
-              customerName: dataObject.customerName,
-              description: dataObject.description,
-              owner: dataObject.owner
-            },
-            pcsta: dataObject.pcsta
-          });
-          const userData = JSON.parse(localStorage.getItem("userData"))
-          userData.groupId = response.data.group._id
-          localStorage.setItem('userData', JSON.stringify(userData))
-          this.$router.push('/grupo-aluno')
-          this.$router.go('/grupo-aluno')
-        }
+        updateUserGroupId(response.data.group._id);
+        this.$router.push("/grupo-aluno");
       } catch (err) {
-        return this.$swal(
-          "Tivemos um problema com o nosso servidor, por favor tente novamente mais tarde."
+        const self = this;
+        showError(
+          self,
+          err,
+          `Não foi possível criar o grupo ${this.groupName}, por favor, tente novamente mais tarde.`
         );
       }
     }

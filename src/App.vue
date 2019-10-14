@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <template v-if=" !['home', 'HandleRouter'].includes($route.name)">
+    <template v-if=" !['LoginPage', 'RedirectorLoaderPage'].includes($route.name)">
       <Navbar />
     </template>
     <v-content>

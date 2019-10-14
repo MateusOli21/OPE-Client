@@ -1,4 +1,6 @@
+import { has } from "../services/LocalStorage";
+
 export const otherwiseMiddlware = (to, from, next) => {
-    if (localStorage.getItem('userData')) return next('/escolhe-grupo')
-    next('/')
-}
+  if (has("googleUserData")) return next("/escolhe-grupo");
+  next("/");
+};
