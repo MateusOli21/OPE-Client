@@ -82,7 +82,7 @@ export default {
   },
   computed: {
     course(){
-      return this.user.pcsta.split("- ")[1]
+      return this.user.pcsta ? this.user.pcsta.split("- ")[1] : ""
     }
   },
   methods: {
