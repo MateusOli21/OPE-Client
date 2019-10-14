@@ -25,14 +25,14 @@
         </template>
 
         <v-card width="300">
-          <v-list class="dropDownMenu">
+          <v-list>
             <v-list-item class="avatar">
               <v-avatar>
                 <v-img :src="user.avatar"></v-img>
               </v-avatar>
             </v-list-item>
 
-            <v-list-item class="username">
+            <v-list-item>
               <v-list-item-content>
                 <v-list-item-title class="title pb-2">{{user.username}}</v-list-item-title>
 
@@ -40,7 +40,14 @@
                   <template v-slot:activator="{ on: tooltip }">
                     <v-list-item-subtitle v-on="{ ...tooltip}">{{user.email}}</v-list-item-subtitle>
                   </template>
-                  <span class="email">{{user.email}}</span>
+                  <span>{{user.email}}</span>
+                </v-tooltip>
+
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on: tooltip }">
+                    <v-list-item-subtitle v-on="{ ...tooltip}">{{course}}</v-list-item-subtitle>
+                  </template>
+                  <span >{{course}}</span>
                 </v-tooltip>
               </v-list-item-content>
             </v-list-item>
@@ -73,10 +80,15 @@ export default {
       user: ""
     };
   },
+  computed: {
+    course(){
+      return this.user.pcsta.split("- ")[1]
+    }
+  },
   methods: {
     async logout() {
       try {
-        await logout();
+        await logout(this.user.email);
         clearStorage();
         this.$router.push("/");
       } catch (err) {
@@ -101,20 +113,9 @@ export default {
   text-decoration: none;
 }
 
-.dropDownMenu {
-  display: flex;
-}
-
-.avatar {
-  align-self: center;
-}
-
-.username {
-  flex: 1;
-}
-
-.email {
-  flex: 1;
+.avatar{
+  float: left;
+  padding-top: 15px;
 }
 </style>
 

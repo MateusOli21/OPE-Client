@@ -23,6 +23,8 @@ export const getMembersByGroupId = groupId => {
   });
 };
 
-export const logout = async function() {
-  return axios.get(`${VUE_APP_AUTH_ENDPOINT}/logout`);
+export const logout = email => {
+  return axios.get(`${VUE_APP_AUTH_ENDPOINT}/logout`, {
+    params: { email }
+  });
 };

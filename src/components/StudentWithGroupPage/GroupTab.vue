@@ -1,65 +1,65 @@
 <template>
-  <div class="descricao-projeto">
-    <v-container grid-list-md text-xs-center>
-      <div class="switch">
-        <v-btn color="error" @click="exitFromGroup" fab small dark>
-          <v-icon>mdi-account-arrow-right</v-icon>
-        </v-btn>
-      </div>
-      <h1 align="center">{{group.groupName}}</h1>
-      <div align="left">
-        <h3>Projeto: {{group.projectName}}</h3>
-        <h3>Cliente: {{group.customerName}}</h3>
-        <v-switch
-          v-if="show"
-          class="switch"
-          v-model="switchOpen"
-          :label="`${switchOpen ? 'Fechar Grupo' : 'Abrir Grupo'}`"
-          @change="updateOpenGroup"
-        ></v-switch>
-
-        <div v-if="show" class="entrance-code">
-          <v-btn color="warning" dark @click="generateNewEntranceCode">Gerar outro</v-btn>
-          <span class="text-code">&nbsp; Código de entrada:</span>
-          <span v-text="group.entranceCode"></span>
+    <div class="descricao-projeto">
+      <v-container grid-list-md text-xs-center>
+        <div class="switch">
+          <v-btn color="error" @click="exitFromGroup" fab small dark>
+            <v-icon>mdi-account-arrow-right</v-icon>
+          </v-btn>
         </div>
-        <br />
-      </div>
-      <v-layout row wrap>
-        <v-flex xs12 sm12 md6 lg6>
-          <v-card>
-            <v-card-title>Integrantes</v-card-title>
-            <v-card height="200px" class="scroll">
-              <v-card-text v-for="(member, index) in members" v-bind:key="index">
-                <h5>
-                  Nome: {{ member.username }}
-                  <v-icon v-if="member.email === group.owner" x-small>mdi-star</v-icon>
-                </h5>
-                <h5>E-mail: {{ member.email }}</h5>
-                <div class="my-2" v-if="show && member.email !== group.owner">
-                  <v-btn color="error" fab x-small dark @click="kickFromGroup(member)">
-                    <v-icon>close</v-icon>
-                  </v-btn>
-                  <v-btn color="primary" fab x-small dark @click="passOwner(member.email)">
-                    <v-icon>mdi-star</v-icon>
-                  </v-btn>
-                </div>
-              </v-card-text>
-            </v-card>
-          </v-card>
-        </v-flex>
+        <h1 align="center">{{group.groupName}}</h1>
+        <div align="left">
+          <h3>Projeto: {{group.projectName}}</h3>
+          <h3>Cliente: {{group.customerName}}</h3>
+          <v-switch
+            v-if="show"
+            class="switch"
+            v-model="switchOpen"
+            :label="`${switchOpen ? 'Fechar Grupo' : 'Abrir Grupo'}`"
+            @change="updateOpenGroup"
+          ></v-switch>
 
-        <v-flex xs12 sm12 md6 lg6>
-          <v-card>
-            <v-card-title>Descrição do projeto</v-card-title>
-            <v-card height="200px" class="scroll">
-              <v-card-text>{{group.description}}</v-card-text>
+          <div v-if="show" class="entrance-code">
+            <v-btn color="warning" dark @click="generateNewEntranceCode">Gerar outro</v-btn>
+            <span class="text-code">&nbsp; Código de entrada:</span>
+            <span v-text="group.entranceCode"></span>
+          </div>
+          <br />
+        </div>
+        <v-layout row wrap>
+          <v-flex xs12 sm12 md6 lg6>
+            <v-card>
+              <v-card-title>Integrantes</v-card-title>
+              <v-card height="200px" class="scroll">
+                <v-card-text v-for="(member, index) in members" v-bind:key="index">
+                  <h5>
+                    Nome: {{ member.username }}
+                    <v-icon v-if="member.email === group.owner" x-small>mdi-star</v-icon>
+                  </h5>
+                  <h5>E-mail: {{ member.email }}</h5>
+                  <div class="my-2" v-if="show && member.email !== group.owner">
+                    <v-btn color="error" fab x-small dark @click="kickFromGroup(member)">
+                      <v-icon>close</v-icon>
+                    </v-btn>
+                    <v-btn color="primary" fab x-small dark @click="passOwner(member.email)">
+                      <v-icon>mdi-star</v-icon>
+                    </v-btn>
+                  </div>
+                </v-card-text>
+              </v-card>
             </v-card>
-          </v-card>
-        </v-flex>
-      </v-layout>
-    </v-container>
-  </div>
+          </v-flex>
+
+          <v-flex xs12 sm12 md6 lg6>
+            <v-card>
+              <v-card-title>Descrição do projeto</v-card-title>
+              <v-card height="200px" class="scroll">
+                <v-card-text>{{group.description}}</v-card-text>
+              </v-card>
+            </v-card>
+          </v-flex>
+        </v-layout>
+      </v-container>
+    </div>
 </template>
 
 <script>
@@ -74,7 +74,6 @@ import {
 } from "../../services/GroupApi";
 
 export default {
-  name: "StudentWithGroup",
   data() {
     return {
       user: getGoogleUserData(),
@@ -183,6 +182,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 .scroll {

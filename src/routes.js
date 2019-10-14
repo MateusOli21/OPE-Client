@@ -3,8 +3,8 @@ import Router from "vue-router";
 import LoginPage from "./views/LoginPage.vue";
 import RedirectorLoaderPage from "./views/RedirectorLoaderPage.vue";
 import StudentWithoutGroupPage from "./views/StudentWithoutGroupPage.vue";
-import PaginaGrupoAluno from "./views/PaginaGrupoAluno.vue";
-import PaginaGrupoProfessor from "./views/PaginaGrupoProfessor.vue";
+import StudentWithGroupPage from "./views/StudentWithGroupPage.vue";
+import TeacherHomePage from "./views/TeacherHomePage.vue";
 import DetailsGroupPage from "./views/DetailsGroupPage.vue";
 import { guestMiddleware } from "./middlewares/guestMiddleware";
 import { authMiddleware } from "./middlewares/authMiddleware";
@@ -28,20 +28,20 @@ export default new Router({
     },
     {
       path: "/escolhe-grupo",
-      name: "chooseGroup",
+      name: "StudentWithoutGroupPage",
       component: StudentWithoutGroupPage,
       beforeEnter: authMiddleware
     },
     {
       path: "/grupo-aluno",
-      name: "paginaGrupoAluno",
-      component: PaginaGrupoAluno,
+      name: "StudentWithGroupPage",
+      component: StudentWithGroupPage,
       beforeEnter: authMiddleware
     },
     {
       path: "/pagina-professor",
-      name: "paginaGrupoProfessor",
-      component: PaginaGrupoProfessor,
+      name: "TeacherHomePage",
+      component: TeacherHomePage,
       beforeEnter: authMiddleware
     },
     {

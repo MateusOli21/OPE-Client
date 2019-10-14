@@ -113,7 +113,8 @@ export default {
             description: this.description,
             owner: this.owner
           },
-          pcsta: this.pcsta
+          pcsta: this.pcsta,
+          courseId: this.user.courseId
         });
         updateUserGroupId(response.data.group._id);
         this.$router.push("/grupo-aluno");
