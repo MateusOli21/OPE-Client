@@ -9,7 +9,7 @@
 <script>
 import MainMenu from '../components/MainMenu'
 import GroupTab from '../components/TeacherPage/GroupTab'
-import SprintTab from '../components/TeacherPage/TabSprint'
+import SprintTab from '../components/TeacherPage/SprintTab'
 
 export default {
   data() {

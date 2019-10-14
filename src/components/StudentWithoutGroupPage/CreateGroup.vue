@@ -83,7 +83,8 @@ export default {
       customerName: "",
       description: "",
       pcsta: googleUserData.pcsta,
-      owner: googleUserData.email
+      owner: googleUserData.email,
+      courseId: googleUserData.courseId
     };
   },
   computed: {
@@ -94,7 +95,8 @@ export default {
         if (
           !dataObject[field].length &&
           field !== "dialog" &&
-          field !== "description"
+          field !== "description" &&
+          field !== "courseId"
         )
           return field;
       });
@@ -114,7 +116,7 @@ export default {
             owner: this.owner
           },
           pcsta: this.pcsta,
-          courseId: this.user.courseId
+          courseId: this.courseId
         });
         updateUserGroupId(response.data.group._id);
         this.$router.push("/grupo-aluno");
