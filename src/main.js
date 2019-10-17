@@ -5,9 +5,11 @@ import VueSweetalert2 from "vue-sweetalert2";
 import App from "./App.vue";
 import vuetify from "./plugins/vuetify";
 import routes from "./routes";
+import vueKanban from 'vue-kanban'
 
 dotenv.config();
 Vue.config.productionTip = false;
+Vue.use(vueKanban)
 
 const options = {
   confirmButtonColor: "#41b882",
