@@ -10,7 +10,7 @@
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
-
+      <span style="margin-right: 15px; color: white;">{{user.username}}</span>
       <v-menu offset-y>
         <template v-slot:activator="{on}">
           <v-btn
@@ -19,9 +19,8 @@
             text
             dark
             slot="activator"
-            style="width: 150px !important"
             v-on="on"
-          >{{user.username}}</v-btn>
+          ><v-img style="border-radius: 35px; width: 30px" :src="user.avatar" /></v-btn>
         </template>
 
         <v-card width="300">
