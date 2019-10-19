@@ -1,65 +1,115 @@
 <template>
-    <div class="descricao-projeto">
-      <v-container grid-list-md text-xs-center>
+  <div class="projectDescription">
+    <v-container grid-list-md text-xs-center>
+      <div class="titles">
+        <h3 class="subTitle">
+          Projeto:
+          <span>{{group.projectName}}</span>
+        </h3>
+        <h1 class="mainTitle">{{group.groupName}}</h1>
+        <h3 class="subTitle">
+          Cliente:
+          <span>{{group.customerName}}</span>
+        </h3>
+      </div>
+      <v-divider></v-divider>
+      <div class="actionButtons">
         <div class="switch">
-          <v-btn color="error" @click="exitFromGroup" fab small dark>
-            <v-icon>mdi-account-arrow-right</v-icon>
-          </v-btn>
+        <v-switch
+          v-if="user.email === group.owner"
+          v-model="switchOpen"
+          :label="`${switchOpen ? 'Fechar Grupo' : 'Abrir Grupo'}`"
+          @change="updateOpenGroup"
+        ></v-switch>
         </div>
-        <h1 align="center">{{group.groupName}}</h1>
-        <div align="left">
-          <h3>Projeto: {{group.projectName}}</h3>
-          <h3>Cliente: {{group.customerName}}</h3>
-          <v-switch
-            v-if="show"
-            class="switch"
-            v-model="switchOpen"
-            :label="`${switchOpen ? 'Fechar Grupo' : 'Abrir Grupo'}`"
-            @change="updateOpenGroup"
-          ></v-switch>
 
-          <div v-if="show" class="entrance-code">
-            <v-btn color="warning" dark @click="generateNewEntranceCode">Gerar outro</v-btn>
-            <span class="text-code">&nbsp; Código de entrada:</span>
-            <span v-text="group.entranceCode"></span>
-          </div>
-          <br />
+        <div v-if="user.email === group.owner" class="entrance-code">
+          <v-dialog persistent v-model="dialog" width="30%">
+            <template v-slot:activator="{ on }">
+              <v-btn v-on="on" style="text-transform: none;" color="primary">Gerar código de entrada</v-btn>
+            </template>
+
+            <v-card>
+              <v-card-title class="pt-7 ml-3">Gerar novo código de entrada</v-card-title>
+              <v-card-text>
+                <v-form class="px-3 pt-5">
+                  <v-text-field outlined prepend-icon="code" disabled v-model="group.entranceCode"></v-text-field>
+                  <div class="flex-grow-1"></div>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                      depressed
+                      outlined
+                      dark
+                      color="indigo darken-1"
+                      @click="dialog=false"
+                    >Fechar</v-btn>
+
+                    <v-btn
+                      outlined
+                      color="indigo darken-1"
+                      class="ml-3 px-4"
+                      @click="generateNewEntranceCode"
+                    >Gerar</v-btn>
+                  </v-card-actions>
+                </v-form>
+              </v-card-text>
+            </v-card>
+          </v-dialog>
         </div>
-        <v-layout row wrap>
-          <v-flex xs12 sm12 md6 lg6>
-            <v-card>
-              <v-card-title>Integrantes</v-card-title>
-              <v-card height="200px" class="scroll">
-                <v-card-text v-for="(member, index) in members" v-bind:key="index">
-                  <h5>
-                    Nome: {{ member.username }}
-                    <v-icon v-if="member.email === group.owner" x-small>mdi-star</v-icon>
-                  </h5>
-                  <h5>E-mail: {{ member.email }}</h5>
-                  <div class="my-2" v-if="show && member.email !== group.owner">
-                    <v-btn color="error" fab x-small dark @click="kickFromGroup(member)">
-                      <v-icon>close</v-icon>
-                    </v-btn>
-                    <v-btn color="primary" fab x-small dark @click="passOwner(member.email)">
-                      <v-icon>mdi-star</v-icon>
-                    </v-btn>
-                  </div>
-                </v-card-text>
-              </v-card>
+        <v-btn v-if="user.isStudent" color="error" @click="exitFromGroup" fab small dark>
+          <v-icon>mdi-account-arrow-right</v-icon>
+        </v-btn>
+      </div>
+      <v-layout row wrap>
+        <v-flex xs12 sm12 md6 lg6>
+          <v-card class="mainMembers">
+            <v-card-title class="membersTitle">Integrantes</v-card-title>
+            <v-card class="members scroll">
+              <v-card-text v-for="(member, index) in members" v-bind:key="index">
+                <h5>
+                  Nome: {{ member.username }}
+                  <v-icon v-if="member.email === group.owner" x-small>mdi-star</v-icon>
+                </h5>
+                <h5>E-mail: {{ member.email }}</h5>
+                <div class="my-2">
+                  <v-btn
+                    color="error"
+                    v-if="(!user.isStudent) || ((user.email !== member.email) && user.email === group.owner)"
+                    fab
+                    x-small
+                    dark
+                    @click="kickFromGroup(member)"
+                  >
+                    <v-icon>close</v-icon>
+                  </v-btn>
+                  <v-btn
+                    color="primary"
+                    v-if="((member.email !== group.owner) && !user.isStudent) || ((user.email !== member.email) && user.email === group.owner)"
+                    fab
+                    x-small
+                    dark
+                    @click="passOwner(member.email)"
+                  >
+                    <v-icon>mdi-star</v-icon>
+                  </v-btn>
+                </div>
+              </v-card-text>
             </v-card>
-          </v-flex>
+          </v-card>
+        </v-flex>
 
-          <v-flex xs12 sm12 md6 lg6>
-            <v-card>
-              <v-card-title>Descrição do projeto</v-card-title>
-              <v-card height="200px" class="scroll">
-                <v-card-text>{{group.description}}</v-card-text>
-              </v-card>
+        <v-flex xs12 sm12 md6 lg6>
+          <v-card class="mainDetails">
+            <v-card-title class="detailsTitle">Descrição do projeto</v-card-title>
+            <v-card class="scroll details">
+              <v-card-text>{{group.description}}</v-card-text>
             </v-card>
-          </v-flex>
-        </v-layout>
-      </v-container>
-    </div>
+          </v-card>
+        </v-flex>
+      </v-layout>
+    </v-container>
+  </div>
 </template>
 
 <script>
@@ -76,16 +126,16 @@ import {
 export default {
   data() {
     return {
+      dialog: false,
       user: getGoogleUserData(),
       members: [],
       group: {},
-      switchOpen: true,
-      show: false
+      switchOpen: true
     };
   },
   async beforeCreate() {
     try {
-      const { groupId, email } = getGoogleUserData();
+      const { groupId } = getGoogleUserData();
       const [
         {
           data: { members }
@@ -100,7 +150,6 @@ export default {
       this.members = members;
       this.group = group;
       this.switchOpen = group.isOpen;
-      this.show = this.group.owner === email ? true : false;
     } catch (err) {
       this.$swal.fire({
         type: "error",
@@ -169,7 +218,6 @@ export default {
       try {
         this.group.owner = newOwnerEmail;
         await updateOpenGroup(this.group);
-        this.show = false;
       } catch (err) {
         this.group.owner = oldOwner;
         this.$swal.fire({
@@ -185,20 +233,78 @@ export default {
 
 
 <style scoped>
+.actionButtons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.projectDescription {
+  font-family: sans-serif;
+}
+.titles {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+}
+.mainTitle {
+  display: inline;
+}
+.subTitle {
+  display: inline;
+  margin-right: 10px;
+}
+.subTitle span {
+  font-weight: normal;
+}
 .scroll {
   overflow-y: auto;
 }
 .switch {
-  display: flex;
-  justify-content: flex-end;
+  display: block;
+  width: 150px;
+}
+.exitFromGroup {
+  display: inline-block;
 }
 .entrance-code {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
+  display: inline-block;
+  padding-bottom: 10px;
+  margin-right: 85px;
 }
 .text-code {
   font-family: "Courier New", Courier, monospace;
   font-weight: bold;
+}
+.mainMembers {
+  height: 400px;
+}
+.mainDetails {
+  height: 400px;
+}
+.members {
+  height: 90%;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.11);
+  box-shadow: none;
+}
+.details {
+  height: 90%;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.11);
+  box-shadow: none;
+  text-align: justify;
+  font-style: italic;
+}
+
+.details .v-card__text {
+  font-size: 1.3rem;
+  color: rgba(0, 0, 0, 0.452);
+}
+
+.detailsTitle {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.11);
+}
+.membersTitle {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.11);
 }
 </style>
