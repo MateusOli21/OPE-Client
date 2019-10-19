@@ -15,12 +15,12 @@
       <v-divider></v-divider>
       <div class="actionButtons">
         <div class="switch">
-        <v-switch
-          v-if="user.email === group.owner"
-          v-model="switchOpen"
-          :label="`${switchOpen ? 'Fechar Grupo' : 'Abrir Grupo'}`"
-          @change="updateOpenGroup"
-        ></v-switch>
+          <v-switch
+            v-if="user.email === group.owner"
+            v-model="switchOpen"
+            :label="`${switchOpen ? 'Fechar Grupo' : 'Abrir Grupo'}`"
+            @change="updateOpenGroup"
+          ></v-switch>
         </div>
 
         <div v-if="user.email === group.owner" class="entrance-code">
@@ -199,18 +199,35 @@ export default {
       }
     },
     async exitFromGroup() {
-      try {
-        await exitFromGroup(this.user.email, this.user.groupId);
-        this.user.groupId = null;
-        setObject("googleUserData", this.user);
-        this.$router.push("/escolhe-grupo");
-        this.$router.go("/escolhe-grupo");
-      } catch (err) {
-        this.$swal.fire({
-          type: "error",
-          title: "Erro",
-          text: err.message
-        });
+      const response = await this.$swal.fire({
+        title: "Você tem certeza que deseja sair do grupo?",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sim, eu tenho!",
+        cancelButtonText: "Cancelar"
+      });
+      if (response.value) {
+        try {
+          this.$swal.fire({
+            title: "Removendo do grupo",
+            onBeforeOpen: () => {
+              this.$swal.showLoading();
+            }
+          });
+          await exitFromGroup(this.user.email, this.user.groupId);
+          this.user.groupId = null;
+          setObject("googleUserData", this.user);
+          this.$router.push("/escolhe-grupo");
+          this.$router.go("/escolhe-grupo");
+        } catch (err) {
+          this.$swal.fire({
+            type: "error",
+            title: "Erro",
+            text: err.message
+          });
+        }
       }
     },
     async passOwner(newOwnerEmail) {
