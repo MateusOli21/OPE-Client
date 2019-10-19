@@ -48,11 +48,19 @@ export default {
     } catch (err) {
       LocalStorage.clearStorage();
       const self = this;
-      showError(
-        self,
-        err,
-        "Tivemos um problema no redirecionamento, por favor, tente novamente mais tarde."
-      );
+      if (err.response.status === 403) {
+        showError(
+          self,
+          err,
+          "Você não tem autorização para acessar essa plataforma."
+        );
+      } else {
+        showError(
+          self,
+          err,
+          "Tivemos um problema no redirecionamento, por favor, tente novamente mais tarde."
+        );
+      }
       this.$router.push("/");
     }
   }
