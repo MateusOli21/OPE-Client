@@ -4,14 +4,6 @@
       <h2>{{ stage }}</h2>
       <!-- TODO; EDITAR A ESTILIZAÇÃO DA COLUNA -->
       <div class="select-sprint" v-if="stage === 'Backlog da Sprint'">
-        <!-- Ainda vamos decidir -->
-        <!-- <v-text-field
-          type="number"
-          label="Sprint"
-          value="1"
-          min="1"
-          max="8"
-        ></v-text-field>-->
         <v-select
           style="width:30%;"
           :items="[1,2,3,4,5,6,7,8]"

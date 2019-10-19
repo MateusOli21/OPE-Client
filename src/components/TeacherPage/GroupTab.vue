@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="actualComponent === 'groupTabTeacher'">
+    <div v-if="!$store.getters.teacherSeeGroupDetails">
       <v-container>
         <v-layout>
           <v-flex>
@@ -33,7 +33,7 @@
         </v-data-table>
       </v-container>
     </div>
-    <div v-if="actualComponent === 'groupTabStudent'">
+    <div v-if="$store.getters.teacherSeeGroupDetails">
       <v-container>
         <v-layout>
           <v-flex>
@@ -58,7 +58,6 @@ export default {
   data() {
     return {
       courses: [],
-      actualComponent: "groupTabTeacher",
       classSelected: "",
       headers: [
         {
@@ -98,12 +97,14 @@ export default {
     details(group) {
       const user = getGoogleUserData();
       user.groupId = group._id;
+      this.$store.commit('teacherSeeGroupDetails', true)
       setObject("googleUserData", user);
       this.actualComponent = "groupTabStudent";
     },
     backToHome() {
       const user = getGoogleUserData();
       user.groupId = "";
+      this.$store.commit('teacherSeeGroupDetails', false)
       setObject("googleUserData", user);
       this.actualComponent = "groupTabTeacher";
     }

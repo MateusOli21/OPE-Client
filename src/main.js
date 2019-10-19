@@ -6,6 +6,7 @@ import App from "./App.vue";
 import vuetify from "./plugins/vuetify";
 import routes from "./routes";
 import vueKanban from 'vue-kanban'
+import { store } from './store/store'
 
 dotenv.config();
 Vue.config.productionTip = false;
@@ -26,6 +27,7 @@ routes.beforeEach((to, from, next) => {
 new Vue({
   router: routes,
   vuetify,
+  store,
   render: h => h(App)
 }).$mount("#app");
 
