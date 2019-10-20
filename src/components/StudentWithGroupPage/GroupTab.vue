@@ -2,14 +2,19 @@
   <div class="projectDescription">
     <v-container grid-list-md text-xs-center>
       <div class="titles">
-        <h3 class="subTitle">
-          Projeto:
-          <span>{{group.projectName}}</span>
-        </h3>
+        <div class="projectName">
+          <h3 class="subTitle">
+            Projeto:
+            <span>{{group.projectName}}</span>
+            <v-icon style="padding-left: 10px;" @click="editProjectName">mdi-pencil</v-icon>
+          </h3>
+        </div>
+
         <h1 class="mainTitle">{{group.groupName}}</h1>
         <h3 class="subTitle">
           Cliente:
           <span>{{group.customerName}}</span>
+          <v-icon style="padding-left: 10px;" @click="editCustomerName">mdi-pencil</v-icon>
         </h3>
       </div>
       <v-divider></v-divider>
@@ -102,7 +107,10 @@
 
         <v-flex xs12 sm12 md6 lg6>
           <v-card class="mainDetails">
-            <v-card-title class="detailsTitle">Descrição do projeto</v-card-title>
+            <v-card-title class="detailsTitle">
+              Descrição do projeto
+              <v-icon style="padding-left: 10px;" @click="editProjectDescription">mdi-pencil</v-icon>
+            </v-card-title>
             <v-card class="scroll details">
               <v-card-text>{{group.description}}</v-card-text>
             </v-card>
@@ -121,7 +129,8 @@ import {
   updateOpenGroup,
   getNewEntranceCode,
   kickFromGroup,
-  exitFromGroup
+  exitFromGroup,
+  updateGroupDetails
 } from "../../services/GroupApi";
 
 export default {
@@ -170,6 +179,54 @@ export default {
     }
   },
   methods: {
+    async editProjectName() {
+      const newProjectName = await this.$swal.fire({
+        title: "Nome do novo projeto",
+        input: "text",
+        inputValue: this.group.projectName,
+        inputAttributes: {
+          autocapitalize: "off"
+        },
+        showCancelButton: true,
+        confirmButtonText: "Salvar",
+        showLoaderOnConfirm: true
+      });
+      if (!newProjectName.value) return;
+      this.group.projectName = newProjectName.value;
+      await updateGroupDetails(this.group);
+    },
+    async editCustomerName() {
+      const newCustomerName = await this.$swal.fire({
+        title: "Nome do novo cliente",
+        input: "text",
+        inputValue: this.group.customerName,
+        inputAttributes: {
+          autocapitalize: "off"
+        },
+        showCancelButton: true,
+        confirmButtonText: "Salvar",
+        showLoaderOnConfirm: true
+      });
+      if (!newCustomerName.value) return;
+      this.group.customerName = newCustomerName.value;
+      await updateGroupDetails(this.group);
+    },
+    async editProjectDescription() {
+      const newProjectDescription = await this.$swal.fire({
+        title: "Descrição do projeto",
+        input: "textarea",
+        inputValue: this.group.description,
+        inputAttributes: {
+          autocapitalize: "off"
+        },
+        showCancelButton: true,
+        confirmButtonText: "Salvar",
+        showLoaderOnConfirm: true
+      });
+      if (!newProjectDescription.value) return;
+      this.group.description = newProjectDescription.value;
+      await updateGroupDetails(this.group);
+    },
     async updateOpenGroup(bool) {
       try {
         this.group.isOpen = bool;
@@ -261,14 +318,6 @@ export default {
 
 
 <style scoped>
-/* .emailColumn {
-  background-color: red !important;
-  width: 40px !important;
-  overflow: hidden;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-} */
 .actionButtons {
   display: flex;
   align-items: center;
@@ -286,10 +335,10 @@ export default {
 }
 .mainTitle {
   display: inline;
+  margin-left: 4%;
 }
 .subTitle {
   display: inline;
-  margin-right: 10px;
 }
 .subTitle span {
   font-weight: normal;
@@ -300,6 +349,9 @@ export default {
 .switch {
   display: block;
   width: 150px;
+}
+.projectName {
+  display: inline-block;
 }
 .exitFromGroup {
   display: inline-block;
@@ -324,14 +376,6 @@ export default {
   border-bottom: 1px solid rgba(0, 0, 0, 0.11);
   box-shadow: none;
 }
-/* .member {
-  width: 100%;
-  display: block;
-}
-.memberActionButton {
-  display: block;
-  float: right;
-} */
 .details {
   height: 90%;
   border-bottom: 1px solid rgba(0, 0, 0, 0.11);
