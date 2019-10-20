@@ -8,18 +8,8 @@
               <v-card width="500px" max-height="550px" class="px-8 py-4">
                 <v-card-title>Procure um grupo</v-card-title>
                 <v-card-text>
-                  <v-select :items="courses" label="Turmas" v-model="classSelected"></v-select>
+                  <v-select :items="courses" label="Turmas" @change="filterOut" v-model="classSelected"></v-select>
                 </v-card-text>
-                <v-card-actions>
-                  <v-btn
-                    depressed
-                    block
-                    dark
-                    color="indigo darken-1"
-                    class="mt-2 mb-2"
-                    @click="filterOut"
-                  >Filtrar</v-btn>
-                </v-card-actions>
               </v-card>
             </v-row>
           </v-flex>
@@ -28,7 +18,7 @@
       <v-container>
         <v-data-table :headers="headers" :items="groups" :items-per-page="10" class="elevation-1">
           <template v-slot:item.action="{ item }">
-            <v-icon x-large class="mr-2" @click="details(item)">mdi-arrow-top-right-thick</v-icon>
+            <v-icon x-large class="mr-2" @click="details(item)">mdi-arrow-right-bold</v-icon>
           </template>
         </v-data-table>
       </v-container>
@@ -90,8 +80,8 @@ export default {
     }
   },
   methods: {
-    async filterOut() {
-      const groups = await getGroups(this.classSelected);
+    async filterOut(classSelected) {
+      const groups = await getGroups(classSelected);
       this.groups = groups.data.groups;
     },
     details(group) {
