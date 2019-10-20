@@ -5,7 +5,6 @@ import RedirectorLoaderPage from "./views/RedirectorLoaderPage.vue";
 import StudentWithoutGroupPage from "./views/StudentWithoutGroupPage.vue";
 import StudentWithGroupPage from "./views/StudentWithGroupPage.vue";
 import TeacherHomePage from "./views/TeacherHomePage.vue";
-import DetailsGroupPage from "./views/DetailsGroupPage.vue";
 import { guestMiddleware } from "./middlewares/guestMiddleware";
 import { authMiddleware } from "./middlewares/authMiddleware";
 import { otherwiseMiddlware } from "./middlewares/otherwiseMiddleware";
@@ -43,11 +42,6 @@ export default new Router({
       name: "TeacherHomePage",
       component: TeacherHomePage,
       beforeEnter: authMiddleware
-    },
-    {
-      path: "/detalhes-grupo",
-      name: "groupDetails",
-      component: DetailsGroupPage
     },
     {
       path: "*",
