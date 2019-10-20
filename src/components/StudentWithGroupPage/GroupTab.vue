@@ -66,35 +66,36 @@
           <v-card class="mainMembers">
             <v-card-title class="membersTitle">Integrantes</v-card-title>
             <v-card class="members scroll">
-              <v-card-text v-for="(member, index) in members" v-bind:key="index">
-                <h5>
-                  Nome: {{ member.username }}
-                  <v-icon v-if="member.email === group.owner" x-small>mdi-star</v-icon>
-                </h5>
-                <h5>E-mail: {{ member.email }}</h5>
-                <div class="my-2">
-                  <v-btn
-                    color="error"
-                    v-if="(!user.isStudent) || ((user.email !== member.email) && user.email === group.owner)"
-                    fab
-                    x-small
-                    dark
-                    @click="kickFromGroup(member)"
-                  >
-                    <v-icon>close</v-icon>
-                  </v-btn>
-                  <v-btn
+              <v-data-table
+                :headers="headers"
+                :items="members"
+                :hide-default-footer="true"
+                class="memberTable"
+              >
+                <template v-slot:item.username="{ item }">
+                  {{ item.username }}
+                  <v-icon v-if="item.email === group.owner" x-small>mdi-star</v-icon>
+                </template>
+                <template v-slot:item.email="{ item }" class="emailColumn">{{ item.email }}</template>
+                <template v-slot:item.actionPassOwner="{ item }">
+                  <v-icon
+                    x-medium
                     color="primary"
-                    v-if="((member.email !== group.owner) && !user.isStudent) || ((user.email !== member.email) && user.email === group.owner)"
-                    fab
-                    x-small
-                    dark
-                    @click="passOwner(member.email)"
-                  >
-                    <v-icon>mdi-star</v-icon>
-                  </v-btn>
-                </div>
-              </v-card-text>
+                    class="mr-2"
+                    v-if="((item.email !== group.owner) && !user.isStudent) || ((user.email !== item.email) && user.email === group.owner)"
+                    @click="passOwner(item.email)"
+                  >mdi-star</v-icon>
+                </template>
+                <template v-slot:item.actionRemove="{item}">
+                  <v-icon
+                    x-medium
+                    color="error"
+                    class="mr-2"
+                    v-if="(!user.isStudent) || ((user.email !== item.email) && user.email === group.owner)"
+                    @click="kickFromGroup(item)"
+                  >mdi-close</v-icon>
+                </template>
+              </v-data-table>
             </v-card>
           </v-card>
         </v-flex>
@@ -128,6 +129,16 @@ export default {
     return {
       dialog: false,
       user: getGoogleUserData(),
+      headers: [
+        {
+          text: "Nome",
+          align: "left",
+          value: "username"
+        },
+        { text: "E-mail", value: "email" },
+        { text: "Passar Liderança", value: "actionPassOwner", sortable: false },
+        { text: "Remover", value: "actionRemove", sortable: false }
+      ],
       members: [],
       group: {},
       switchOpen: true
@@ -250,6 +261,14 @@ export default {
 
 
 <style scoped>
+/* .emailColumn {
+  background-color: red !important;
+  width: 40px !important;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+} */
 .actionButtons {
   display: flex;
   align-items: center;
@@ -305,6 +324,14 @@ export default {
   border-bottom: 1px solid rgba(0, 0, 0, 0.11);
   box-shadow: none;
 }
+/* .member {
+  width: 100%;
+  display: block;
+}
+.memberActionButton {
+  display: block;
+  float: right;
+} */
 .details {
   height: 90%;
   border-bottom: 1px solid rgba(0, 0, 0, 0.11);
@@ -312,12 +339,10 @@ export default {
   text-align: justify;
   font-style: italic;
 }
-
 .details .v-card__text {
   font-size: 1.3rem;
   color: rgba(0, 0, 0, 0.452);
 }
-
 .detailsTitle {
   border-bottom: 1px solid rgba(0, 0, 0, 0.11);
 }
