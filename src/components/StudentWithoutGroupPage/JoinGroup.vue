@@ -9,7 +9,7 @@
         <v-card-title class="pt-7 pb-4 ml-3">Insira o código do grupo</v-card-title>
         <v-card-text>
           <v-form class="px-3">
-            <v-text-field outlined label="Código" v-model="code" prepend-icon="lock"></v-text-field>
+            <v-text-field outlined label="Código" v-model="code" prepend-icon="mdi-lock"></v-text-field>
 
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -38,13 +38,14 @@
 
 <script>
 import { joinGroupByCode } from "../../services/GroupApi";
-import { getGoogleUserData, setObject } from "../../services/LocalStorage";
+import { getGoogleUserData, setObject } from "../../services/LocalForage";
 import { showError } from "../../errors/sweetAlertError";
 
-const updateUserGroupId = groupId => {
-  const googleUserData = getGoogleUserData();
+const updateUserGroupId = async groupId => {
+  const user = await getGoogleUserData();
+  const googleUserData = JSON.parse(user);
   googleUserData.groupId = groupId;
-  setObject("googleUserData", googleUserData);
+  await setObject("googleUserData", JSON.stringify(googleUserData));
 };
 
 export default {
@@ -52,8 +53,12 @@ export default {
     return {
       dialog: false,
       code: "",
-      user: getGoogleUserData()
+      user: {}
     };
+  },
+  async beforeCreate() {
+    const user = await getGoogleUserData();
+    this.user = JSON.parse(user);
   },
   computed: {
     hasNotCode() {
@@ -63,8 +68,15 @@ export default {
   methods: {
     async associate() {
       try {
+        this.$swal.fire({
+          title: "Entrando no grupo",
+          timer: 1000,
+          onBeforeOpen: () => {
+            this.$swal.showLoading();
+          }
+        });
         const response = await joinGroupByCode(this.code, this.user.email);
-        updateUserGroupId(response.data.group._id);
+        await updateUserGroupId(response.data.group._id);
         this.$router.push("/grupo-aluno");
       } catch (err) {
         const self = this;

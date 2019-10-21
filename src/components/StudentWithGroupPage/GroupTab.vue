@@ -6,7 +6,7 @@
           <h3 class="subTitle">
             Projeto:
             <span>{{group.projectName}}</span>
-            <v-icon style="padding-left: 10px;" @click="editProjectName">mdi-pencil</v-icon>
+            <v-icon style="padding-left: 10px;" v-if="user.isStudent" @click="editProjectName">mdi-pencil</v-icon>
           </h3>
         </div>
 
@@ -14,7 +14,7 @@
         <h3 class="subTitle">
           Cliente:
           <span>{{group.customerName}}</span>
-          <v-icon style="padding-left: 10px;" @click="editCustomerName">mdi-pencil</v-icon>
+          <v-icon style="padding-left: 10px;" v-if="user.isStudent" @click="editCustomerName">mdi-pencil</v-icon>
         </h3>
       </div>
       <v-divider></v-divider>
@@ -38,7 +38,7 @@
               <v-card-title class="pt-7 ml-3">Gerar novo código de entrada</v-card-title>
               <v-card-text>
                 <v-form class="px-3 pt-5">
-                  <v-text-field outlined prepend-icon="code" disabled v-model="group.entranceCode"></v-text-field>
+                  <v-text-field outlined prepend-icon="mdi-lock" disabled v-model="group.entranceCode"></v-text-field>
                   <div class="flex-grow-1"></div>
                   <v-card-actions>
                     <v-spacer></v-spacer>
@@ -109,7 +109,7 @@
           <v-card class="mainDetails">
             <v-card-title class="detailsTitle">
               Descrição do projeto
-              <v-icon style="padding-left: 10px;" @click="editProjectDescription">mdi-pencil</v-icon>
+              <v-icon style="padding-left: 10px;" v-if="user.isStudent" @click="editProjectDescription">mdi-pencil</v-icon>
             </v-card-title>
             <v-card class="scroll details">
               <v-card-text>{{group.description}}</v-card-text>
@@ -123,7 +123,7 @@
 
 <script>
 import { getMembersByGroupId } from "../../services/AuthApi";
-import { getGoogleUserData, setObject } from "../../services/LocalStorage";
+import { getGoogleUserData, setObject, setItem } from "../../services/LocalForage";
 import {
   getGroupById,
   updateOpenGroup,
@@ -137,7 +137,7 @@ export default {
   data() {
     return {
       dialog: false,
-      user: getGoogleUserData(),
+      user: "",
       headers: [
         {
           text: "Nome",
@@ -153,9 +153,14 @@ export default {
       switchOpen: true
     };
   },
+  props: {
+    groupId: String
+  },
   async beforeCreate() {
     try {
-      const { groupId } = getGoogleUserData();
+      const user = await getGoogleUserData();
+      this.user = JSON.parse(user)
+      const groupId = this.user.groupId || this.groupId;
       const [
         {
           data: { members }
@@ -286,7 +291,8 @@ export default {
           });
           await exitFromGroup(this.user.email, this.user.groupId);
           this.user.groupId = null;
-          setObject("googleUserData", this.user);
+          await setObject("googleUserData", JSON.stringify(this.user));
+          await setItem("path", "/escolhe-grupo")
           this.$router.push("/escolhe-grupo");
           this.$router.go("/escolhe-grupo");
         } catch (err) {

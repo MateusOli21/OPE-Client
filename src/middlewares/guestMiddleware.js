@@ -1,11 +1,12 @@
-import { getGoogleUserData } from "../services/LocalStorage";
+import { getGoogleUserData } from "../services/LocalForage";
 
-export const guestMiddleware = (to, from, next) => {
-  const userData = getGoogleUserData();
-  if (userData && userData.isStudent && !userData.groupId)
+export const guestMiddleware = async (to, from, next) => {
+  const userData = await getGoogleUserData();
+  const user = JSON.parse(userData)
+  if (user && user.isStudent && !user.groupId)
     return next("/escolhe-grupo");
-  if (userData && userData.isStudent && userData.groupId)
+  if (user && user.isStudent && user.groupId)
     return next("/grupo-aluno");
-  if (userData && !userData.isStudent) return next("/pagina-professor");
+  if (user && !user.isStudent) return next("/pagina-professor");
   next();
 };

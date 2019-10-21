@@ -28,30 +28,34 @@
         </v-layout>
       </v-container>
     </div>
-    <SprintTab v-if="$store.getters.teacherSeeGroupDetails"/>
+    <SprintTab v-if="$store.getters.teacherSeeGroupDetails" />
   </div>
 </template>
 
 <script>
-import SprintTab from '../StudentWithGroupPage/SprintTab'
-import { getGoogleUserData } from '../../services/LocalStorage'
+import SprintTab from "../StudentWithGroupPage/SprintTab";
+import { getGoogleUserData } from "../../services/LocalForage";
 
 export default {
   data() {
     return {
-      user: getGoogleUserData(),
+      user: {},
       courses: []
-    }
+    };
+  },
+  async beforeCreate() {
+    const user = await getGoogleUserData();
+    this.user = JSON.parse(user);
   },
   components: {
     SprintTab
   },
   methods: {
     iniciarSprint() {
-      return
+      return;
     }
   }
-}
+};
 </script>
 
 <style scoped>

@@ -12,7 +12,7 @@
             <v-text-field
               outlined
               label="Nome do grupo"
-              prepend-icon="group"
+              prepend-icon="mdi-account-group"
               v-model="groupName"
               required
               :rules="[() => groupName.length > 0 || 'Campo obrigatório']"
@@ -20,7 +20,7 @@
             <v-text-field
               outlined
               label="Nome do projeto"
-              prepend-icon="folder"
+              prepend-icon="mdi-folder"
               v-model="projectName"
               required
               :rules="[() => projectName.length > 0 || 'Campo obrigatório']"
@@ -28,7 +28,7 @@
             <v-text-field
               outlined
               label="Nome do cliente"
-              prepend-icon="work"
+              prepend-icon="mdi-account"
               v-model="customerName"
               required
               :rules="[() => customerName.length > 0 || 'Campo obrigatório']"
@@ -37,7 +37,7 @@
               outlined
               label="Descrição do projeto"
               height="100"
-              prepend-icon="edit"
+              prepend-icon="mdi-pencil"
               v-model="description"
             ></v-textarea>
             <div class="flex-grow-1"></div>
@@ -63,29 +63,35 @@
 
 <script>
 import { createGroup } from "../../services/GroupApi";
-import { getGoogleUserData, setObject } from "../../services/LocalStorage";
+import { getGoogleUserData, setObject } from "../../services/LocalForage";
 import { showError } from "../../errors/sweetAlertError";
 
-const updateUserGroupId = groupId => {
-  const googleUserData = getGoogleUserData();
+const updateUserGroupId = async groupId => {
+  const user = await getGoogleUserData();
+  const googleUserData = JSON.parse(user);
   googleUserData.groupId = groupId;
-  setObject("googleUserData", googleUserData);
+  await setObject("googleUserData", JSON.stringify(googleUserData));
 };
 
 export default {
   data() {
-    const googleUserData = getGoogleUserData();
-
     return {
       dialog: false,
       groupName: "",
       projectName: "",
       customerName: "",
       description: "",
-      pcsta: googleUserData.pcsta,
-      owner: googleUserData.email,
-      courseId: googleUserData.courseId
+      pcsta: "",
+      owner: "",
+      courseId: ""
     };
+  },
+  async beforeCreate() {
+    const userData = await getGoogleUserData();
+    const user = JSON.parse(userData);
+    this.pcsta = user.pcsta;
+    this.owner = user.email;
+    this.courseId = user.courseId;
   },
   computed: {
     requiredFieldsIsEmpty() {
@@ -107,6 +113,13 @@ export default {
   methods: {
     async create() {
       try {
+        this.$swal.fire({
+          title: "Criando grupo",
+          timer: 1000,
+          onBeforeOpen: () => {
+            this.$swal.showLoading();
+          }
+        });
         const response = await createGroup({
           group: {
             groupName: this.groupName,
@@ -118,7 +131,7 @@ export default {
           pcsta: this.pcsta,
           courseId: this.courseId
         });
-        updateUserGroupId(response.data.group._id);
+        await updateUserGroupId(response.data.group._id);
         this.$router.push("/grupo-aluno");
       } catch (err) {
         const self = this;

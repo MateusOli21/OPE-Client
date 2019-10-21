@@ -8,12 +8,9 @@
 
 <script>
 import { getGoogleUserData } from "../services/AuthApi";
-import * as LocalStorage from "../services/LocalStorage";
+import * as LocalForage from "../services/LocalForage";
 import { showError } from "../errors/sweetAlertError";
 
-const setCodeInLocalStorage = code => LocalStorage.setItem("code", code);
-const storeGoogleUserData = googleUserData =>
-  LocalStorage.setObject("googleUserData", googleUserData);
 const getCorrectPathAccordingGoogleUserData = ({ isStudent, groupId }) => {
   let path = "/";
   if (isStudent && groupId) {
@@ -32,23 +29,33 @@ export default {
     let googleUserData;
     try {
       const codeOfGoogleInUrl = window.location.href.split("code=")[1];
+      const setCodeInLocalForage = async code =>
+        await LocalForage.setItem("code", code);
+      const storeGoogleUserData = async googleUserData =>
+        await LocalForage.setObject(
+          "googleUserData",
+          JSON.stringify(googleUserData)
+        );
+      const user = await LocalForage.getGoogleUserData();
 
-      if (!LocalStorage.has("code")) {
-        setCodeInLocalStorage(codeOfGoogleInUrl);
+      if (!(await LocalForage.has("code"))) {
+        await setCodeInLocalForage(codeOfGoogleInUrl);
         const response = await getGoogleUserData(codeOfGoogleInUrl);
         googleUserData = response.data.user;
-        storeGoogleUserData(googleUserData);
+        await storeGoogleUserData(googleUserData);
       }
 
-      if (!LocalStorage.has("googleUserData"))
+      if (!(await LocalForage.has("googleUserData")))
         throw new Error("Não foi possível conectar a sua conta Google.");
 
-      const path = getCorrectPathAccordingGoogleUserData(googleUserData);
+      let actualUser = googleUserData || JSON.parse(user);
+
+      const path = getCorrectPathAccordingGoogleUserData(actualUser);
       return this.$router.push(path);
     } catch (err) {
-      LocalStorage.clearStorage();
+      await LocalForage.clearStorage();
       const self = this;
-      if (err.response.status === 403) {
+      if (err.response && err.response.status === 403) {
         showError(
           self,
           err,
