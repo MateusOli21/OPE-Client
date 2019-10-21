@@ -57,7 +57,7 @@
           <v-list nav dense>
             <v-list-item link v-on:click="logout">
               <v-list-item-icon>
-                <v-icon>exit_to_app</v-icon>
+                <v-icon>mdi-exit-to-app</v-icon>
               </v-list-item-icon>
               <v-list-item-title>Sair</v-list-item-title>
             </v-list-item>
@@ -70,7 +70,7 @@
 
 <script>
 import { logout } from "../services/AuthApi";
-import { getGoogleUserData, clearStorage } from "../services/LocalStorage";
+import { getGoogleUserData, clearStorage } from "../services/LocalForage";
 import { showError } from "../errors/sweetAlertError";
 
 export default {
@@ -88,7 +88,7 @@ export default {
     async logout() {
       try {
         await logout(this.user.email);
-        clearStorage();
+        await clearStorage();
         this.$router.push("/");
       } catch (err) {
         const self = this;
@@ -100,8 +100,9 @@ export default {
       }
     }
   },
-  created() {
-    this.user = getGoogleUserData();
+  async created() {
+    const user = await getGoogleUserData();
+    this.user = JSON.parse(user)
   }
 };
 </script>

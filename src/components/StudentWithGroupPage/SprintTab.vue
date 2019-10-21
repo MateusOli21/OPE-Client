@@ -26,40 +26,30 @@
     <div class="k-footer" v-for="stage in stages" :key="stage" :slot="`footer-${stage}`">
       <v-dialog persistent v-model="dialog" width="30%">
         <template v-slot:activator="{ on }">
-          <button class="btn-create-card" @click="selectStage(stage)" v-on="on">+ Adicionar um novo cartão</button>
+          <button
+            class="btn-create-card"
+            @click="selectStage(stage)"
+            v-on="on"
+          >+ Adicionar um novo cartão</button>
         </template>
 
         <v-card>
           <v-card-title class="pt-7 ml-3">Criar cartão</v-card-title>
           <v-card-text>
             <v-form class="px-3 pt-5">
-              <v-text-field
-                outlined
-                label="Nome do grupo"
-                prepend-icon="group"
-                v-model="groupName"
-                required
-                :rules="[() => groupName.length > 0 || 'Campo obrigatório']"
-              ></v-text-field>
+              <v-text-field outlined label="Nome do grupo" prepend-icon="mdi-group" required></v-text-field>
               <v-textarea
                 outlined
                 label="Descrição do projeto"
                 height="100"
-                prepend-icon="edit"
-                v-model="description"
+                prepend-icon="mdi-pencil"
               ></v-textarea>
               <div class="flex-grow-1"></div>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn depressed outlined dark color="indigo darken-1" @click="dialog=false">Fechar</v-btn>
 
-                <v-btn
-                  outlined
-                  color="indigo darken-1"
-                  class="ml-3 px-4"
-                  :disabled="requiredFieldsIsEmpty"
-                  @click="addCard()"
-                >Criar</v-btn>
+                <v-btn outlined color="indigo darken-1" class="ml-3 px-4" @click="addCard()">Criar</v-btn>
               </v-card-actions>
             </v-form>
           </v-card-text>
@@ -70,18 +60,18 @@
 </template>
 
 <script>
-import { getGoogleUserData } from "../../services/LocalStorage";
+import { getGoogleUserData } from "../../services/LocalForage";
 
 export default {
   data() {
     return {
       dialog: false,
-      user: getGoogleUserData(),
+      user: "",
       sprintDefault: 1,
       sprintStartDate: "10/10/2019",
       sprintEndDate: "26/10/2019",
       createCardTo: '',
-      stages: [],
+      stages: ["Backlog Global", "Backlog da Sprint"],
       blocks: [
         {
           id: 1,
@@ -173,9 +163,9 @@ export default {
       this.createCardTo = stage
     }
   },
-  beforeMount() {
-    if (this.user.isStudent)
-      this.stages = ["Backlog Global", "Backlog da Sprint"];
+  async beforeMount() {
+    const user = await getGoogleUserData();
+    this.user = JSON.parse(user)
     if (!this.user.isStudent)
       this.stages = ["Backlog Prometido", "Backlog da Sprint"];
   }

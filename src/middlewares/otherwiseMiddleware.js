@@ -1,6 +1,6 @@
-import { has } from "../services/LocalStorage";
+import { has } from "../services/LocalForage";
 
-export const otherwiseMiddlware = (to, from, next) => {
-  if (has("googleUserData")) return next("/escolhe-grupo");
+export const otherwiseMiddlware = async (to, from, next) => {
+  if (await has("googleUserData")) return next("/escolhe-grupo");
   next("/");
 };

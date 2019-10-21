@@ -23,14 +23,14 @@
         </v-data-table>
       </v-container>
     </div>
-    <div v-if="$store.getters.teacherSeeGroupDetails">
+    <div v-if="!!$store.getters.teacherSeeGroupDetails">
       <v-container>
         <v-layout>
           <v-flex>
             <v-btn color="info" @click="backToHome" fab small dark>
               <v-icon>mdi-arrow-left</v-icon>
             </v-btn>
-            <GroupTab />
+            <GroupTab :groupId="$store.getters.teacherSeeGroupDetails" />
           </v-flex>
         </v-layout>
       </v-container>
@@ -41,7 +41,7 @@
 <script>
 import { getAllPcsta, getGroups } from "../../services/GroupApi";
 import { showError } from "../../errors/sweetAlertError";
-import { setObject, getGoogleUserData } from "../../services/LocalStorage";
+import { setObject, getGoogleUserData } from "../../services/LocalForage";
 import GroupTab from "../StudentWithGroupPage/GroupTab";
 
 export default {
@@ -67,6 +67,8 @@ export default {
     GroupTab
   },
   async beforeCreate() {
+    const user = await getGoogleUserData();
+    this.user = JSON.parse(user);
     try {
       const pcstas = await getAllPcsta();
       this.courses = pcstas.data.pcstas.map(pcsta => pcsta.title);
@@ -84,18 +86,18 @@ export default {
       const groups = await getGroups(classSelected);
       this.groups = groups.data.groups;
     },
-    details(group) {
-      const user = getGoogleUserData();
+    async details(group) {
+      const user = this.user
       user.groupId = group._id;
-      this.$store.commit('teacherSeeGroupDetails', true)
-      setObject("googleUserData", user);
+      this.$store.commit('teacherSeeGroupDetails', group._id)
+      await setObject("googleUserData", JSON.stringify(user));
       this.actualComponent = "groupTabStudent";
     },
-    backToHome() {
-      const user = getGoogleUserData();
+    async backToHome() {
+      const user = this.user;
       user.groupId = "";
       this.$store.commit('teacherSeeGroupDetails', false)
-      setObject("googleUserData", user);
+      await setObject("googleUserData", JSON.stringify(user));
       this.actualComponent = "groupTabTeacher";
     }
   }
