@@ -19,12 +19,13 @@
       </div>
       <v-divider></v-divider>
       <div class="actionButtons">
-        <div class="switch">
+        <div>
           <v-switch
             v-if="user.email === group.owner"
             v-model="switchOpen"
             :label="`${switchOpen ? 'Fechar Grupo' : 'Abrir Grupo'}`"
             @change="updateOpenGroup"
+            class="switch"
           ></v-switch>
         </div>
 
@@ -328,6 +329,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
 }
 .projectDescription {
   font-family: sans-serif;
@@ -352,20 +354,11 @@ export default {
 .scroll {
   overflow-y: auto;
 }
-.switch {
-  display: block;
-  width: 150px;
-}
 .projectName {
   display: inline-block;
 }
 .exitFromGroup {
   display: inline-block;
-}
-.entrance-code {
-  display: inline-block;
-  padding-bottom: 10px;
-  margin-right: 85px;
 }
 .text-code {
   font-family: "Courier New", Courier, monospace;
@@ -398,5 +391,8 @@ export default {
 }
 .membersTitle {
   border-bottom: 1px solid rgba(0, 0, 0, 0.11);
+}
+.entrance-code {
+  margin-right: 10%;
 }
 </style>
