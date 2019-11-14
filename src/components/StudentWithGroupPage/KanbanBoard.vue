@@ -121,9 +121,20 @@ export default {
 <style lang="scss">
 @import "node_modules/vue-kanban/src/assets/kanban.scss";
 
-.drag-inner-list {
-  height: 650px;
-  overflow-y: scroll;
+li.drag-column.drag-column-Backlog.Global {
+  .drag-inner-list {
+    overflow-y: scroll;
+    height: 100%;
+    max-height: 700px;
+  }
+}
+
+li.drag-column.drag-column-Backlog.da.Sprint {
+  .drag-inner-list {
+    overflow-y: scroll;
+    height: 100%;
+    max-height: 642px;
+  }
 }
 
 .drag-container {
