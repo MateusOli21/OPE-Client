@@ -14,7 +14,7 @@
             name="title"
             prepend-icon="mdi-format-title"
             v-model="card.title"
-            :rules="[(v) => v.length > 0 || 'Campo obrigatório']"
+            :rules="[(v) => (v.length > 0 || wasCleaned) || 'Campo obrigatório']"
           ></v-text-field>
           <v-select
             :items="members"
@@ -22,7 +22,7 @@
             return-object
             prepend-icon="mdi-account"
             label="Nome do responsável"
-            :rules="[(v) => !!v || 'Campo obrigatório']"
+            :rules="[(v) => (!!v.text || wasCleaned) || 'Campo obrigatório']"
             required
           ></v-select>
           <v-select
@@ -30,7 +30,7 @@
             v-model="card.priority"
             prepend-icon="mdi-exclamation"
             label="Prioridade"
-            :rules="[(v) => !!v || 'Campo obrigatório']"
+            :rules="[(v) => (!!v || wasCleaned) || 'Campo obrigatório']"
             required
           ></v-select>
           <v-select
@@ -38,15 +38,15 @@
             v-model="card.sprintNumber"
             prepend-icon="mdi-ballot-outline"
             label="Número da sprint"
-            :rules="[(v) => !!v.toString() || 'Campo obrigatório']"
+            :rules="[(v) => (!!v.toString() || wasCleaned) || 'Campo obrigatório']"
             required
           ></v-select>
           <v-select
-            :items="status"
-            v-model="card.status"
+            :items="statusCard"
+            v-model="card.statusCard"
             prepend-icon="mdi-traffic-light"
             label="Status"
-            :rules="[(v) => !!v || 'Campo obrigatório']"
+            :rules="[(v) => (!!v || wasCleaned) || 'Campo obrigatório']"
             required
           ></v-select>
           <v-select
@@ -54,7 +54,7 @@
             v-model="card.storyPoints"
             prepend-icon="mdi-crosshairs-gps"
             label="Pontos de estória"
-            :rules="[(v) => !!v || 'Campo obrigatório']"
+            :rules="[(v) => (!!v || wasCleaned) || 'Campo obrigatório']"
             required
           ></v-select>
           <v-textarea
@@ -73,7 +73,7 @@
               color="indigo darken-1"
               class="ml-3 px-4"
               :disabled="requiredFieldsIsEmpty"
-              @click="addCard"
+              @click="() => { addCard(); dialog = false }"
             >Criar</v-btn>
           </v-card-actions>
         </v-form>
@@ -122,10 +122,11 @@ export default {
         description: "",
         storyPoints: "",
         status: "",
+        statusCard: "",
         sprintNumber: 0,
         historic: []
       },
-      status: ["Pendente", "Fazendo", "Concluído", "Bloqueado"],
+      statusCard: ["Pendente", "Fazendo", "Concluído", "Bloqueado"],
       stages: ["Backlog Global", "Backlog da Sprint"],
       priorities: [
         { text: "Alta", value: "alta" },
@@ -145,7 +146,8 @@ export default {
         8
       ],
       storyPoints: [1, 2, 3, 4, 5, 6, 7, 8],
-      members: []
+      members: [],
+      wasCleaned: false
     };
   },
   computed: {
@@ -156,7 +158,8 @@ export default {
         if (
           this.card[field].toString().length < 1 &&
           field !== "description" &&
-          field !== "historic"
+          field !== "historic" &&
+          field !== "status"
         )
           return true;
       });
@@ -178,6 +181,7 @@ export default {
         sprintNumber: 0,
         historic: []
       };
+      this.wasCleaned = true
     },
     async addCard() {
       this.card.groupId = this.user.groupId;
@@ -185,8 +189,9 @@ export default {
         name: this.card.responsibleObject.text,
         avatar: this.card.responsibleObject.avatar
       };
+      this.card.status = this.card.statusCard
       try {
-        const { data } = await createCard(this.card);
+        await createCard(this.card);
         this.cleanCreateCard();
         this.oncreate();
       } catch (err) {}

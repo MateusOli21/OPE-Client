@@ -13,10 +13,10 @@
     />
     <KanbanCard
       v-for="block in blocks"
-      :slot="block.id"
       :key="block.id"
       :block="block"
       :onchange="getCardsBySprint"
+      :slot="block.id"
     />
     <KanbanFooter
       v-for="stage in stages"
@@ -83,10 +83,11 @@ export default {
       this.blocks = data;
     },
     async updateBlock(cardId, newStage) {
-      const card = this.blocks.find(card => card.id === cardId);
-      const originalPosition = card.sprintNumber;
-      const originalStatus = card.status;
       try {
+        const card = this.blocks.find(card => card.id === cardId);
+        const copyOfCard = { ...card };
+        const originalPosition = copyOfCard.sprintNumber;
+        const originalStatus = copyOfCard.status;
         if (newStage === "Backlog Global") {
           card.sprintNumber = 0;
           card.status = "Backlog Global";
@@ -95,10 +96,17 @@ export default {
           card.sprintNumber = this.sprintSelected;
           card.status = "Backlog da Sprint";
         }
-        await updateCard(card);
+        copyOfCard.sprintNumber =
+          newStage === "Backlog Global"
+            ? 0
+            : newStage === "Backlog da Sprint"
+            ? this.sprintSelected
+            : originalPosition;
+        copyOfCard.status = copyOfCard.statusCard;
+        const { data } = await updateCard(card);
       } catch (err) {
-        card.sprintNumber = originalPosition;
         card.status = originalStatus;
+        card.sprintNumber = originalPosition;
       }
     },
     getPriorityColor(priority) {
@@ -139,35 +147,6 @@ export default {
   color: black;
   height: 130px;
 
-  div {
-    width: 100%;
-    display: flex;
-
-    .k-red {
-      background-color: red;
-      width: 20px;
-      height: 20px;
-      border-radius: 35px;
-      border: 1px solid #a5a4a4;
-    }
-
-    .k-yellow {
-      background-color: yellow;
-      width: 20px;
-      height: 20px;
-      border-radius: 35px;
-      border: 1px solid #a5a4a4;
-    }
-
-    .k-green {
-      background-color: green;
-      width: 20px;
-      height: 20px;
-      border-radius: 35px;
-      border: 1px solid #a5a4a4;
-    }
-  }
-
   h4 {
     font-weight: normal;
     color: #414141;
@@ -181,6 +160,32 @@ export default {
   &.is-moving {
     transform: none;
     background-color: #ebecf0;
+    div.v-avatar.ma-3.k-img.v-avatar--tile {
+      margin-top: 13px;
+      margin-left: 13px;
+    }
+
+    div.v-card__actions {
+      margin-left: 10px;
+    }
+
+    div.overline.mb-2 {
+      margin-bottom: 8px !important;
+      font-size: 0.625rem !important;
+      font-weight: 400;
+      letter-spacing: 0.1666666667em !important;
+      line-height: 1rem;
+      text-transform: uppercase;
+    }
+
+    div.v-list-item__title.headline.mb-1 {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-size: 1.1em !important;
+      width: 310px;
+      display: block;
+      overflow: hidden;
+    }
   }
 }
 </style>
