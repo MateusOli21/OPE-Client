@@ -3,15 +3,19 @@
     <div>
       <h2>{{ currentStage }}</h2>
     </div>
-    <div class="select-sprint" v-if="currentStage === 'Backlog da Sprint'">
-      <v-select
-        :items="sprintNumberForSprintSelect"
-        @change="changeSprintNumber"
-        v-model="sprintDefault"
-        :label="label"
-      ></v-select>
-      <span>Data de início: {{sprintStartDate}}</span>
-      <span>Data final: {{sprintEndDate}}</span>
+    <div v-if="currentStage === 'Backlog da Sprint'">
+      <div class="select-sprint">
+        <v-select
+          :items="sprintNumberForSprintSelect"
+          @change="changeSprintNumber"
+          v-model="sprintDefault"
+          :label="label"
+        ></v-select>
+      </div>
+      <div class="dates-of-sprint">
+        <span>Data de início: {{sprintStartDate ? sprintStartDate : '__/__/__'}}</span>
+        <span>Data final: {{sprintEndDate ? sprintEndDate : '__/__/__'}}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -44,8 +48,15 @@ export default {
 
 <style lang="scss">
 .select-sprint {
+  width: 15%;
+  margin-top: 29px;
   h4 {
     font-weight: normal !important;
   }
+}
+.dates-of-sprint {
+  display: flex;
+  width: 440px;
+  justify-content: space-between;
 }
 </style>

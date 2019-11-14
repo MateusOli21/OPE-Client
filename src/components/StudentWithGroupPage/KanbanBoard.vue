@@ -29,12 +29,8 @@
 </template>
 
 <script>
-import {
-  updateCard,
-  // getSprintInfo,
-  getCards
-} from "../../services/SprintApi";
-// import { getAllPcsta } from "../../services/GroupApi";
+import { updateCard, getSprintInfo, getCards } from "../../services/SprintApi";
+import { getAllPcsta } from "../../services/GroupApi";
 import KanbanHeader from "./KanbanHeader";
 import KanbanFooter from "./KanbanFooter";
 import KanbanCard from "./KanbanCard";
@@ -42,12 +38,20 @@ import KanbanCard from "./KanbanCard";
 export default {
   watch: {
     async user() {
-      /* const {
-       data: { pcstas }
-     } = await getAllPcsta();
-     const pcsta = pcstas.find(pcsta => pcsta.courseId === this.user.courseId);
-     const { data: sprintInfo } = await getSprintInfo(pcsta._id);
-     console.log("sprintInfo:", sprintInfo); */
+      const {
+        data: { pcstas }
+      } = await getAllPcsta();
+      const pcsta = pcstas.find(pcsta => pcsta.courseId === this.user.courseId);
+      const { data: sprintInfo } = await getSprintInfo(pcsta._id);
+      if (sprintInfo && sprintInfo.length) {
+        const currentSprintInfo = sprintInfo.find(
+          info => info.sprintNumber === this.sprintSelected
+        );
+        if (currentSprintInfo) {
+          this.sprintStartDate = currentSprintInfo.sprintStartDate;
+          this.sprintEndDate = currentSprintInfo.sprintEndDate;
+        }
+      }
       if (!this.user.isStudent)
         this.stages = ["Backlog Prometido", "Backlog da Sprint"];
       this.getCardsBySprint();
@@ -64,8 +68,8 @@ export default {
   data() {
     return {
       sprintSelected: 1,
-      sprintStartDate: "10/10/2019",
-      sprintEndDate: "26/10/2019",
+      sprintStartDate: "",
+      sprintEndDate: "",
       stages: ["Backlog Global", "Backlog da Sprint"],
       blocks: []
     };
@@ -83,11 +87,11 @@ export default {
       this.blocks = data;
     },
     async updateBlock(cardId, newStage) {
+      const card = this.blocks.find(card => card.id === cardId);
+      const copyOfCard = { ...card };
+      const originalPosition = copyOfCard.sprintNumber;
+      const originalStatus = copyOfCard.status;
       try {
-        const card = this.blocks.find(card => card.id === cardId);
-        const copyOfCard = { ...card };
-        const originalPosition = copyOfCard.sprintNumber;
-        const originalStatus = copyOfCard.status;
         if (newStage === "Backlog Global") {
           card.sprintNumber = 0;
           card.status = "Backlog Global";
@@ -103,7 +107,7 @@ export default {
             ? this.sprintSelected
             : originalPosition;
         copyOfCard.status = copyOfCard.statusCard;
-        const { data } = await updateCard(card);
+        await updateCard(card);
       } catch (err) {
         card.status = originalStatus;
         card.sprintNumber = originalPosition;
@@ -133,7 +137,7 @@ li.drag-column.drag-column-Backlog.da.Sprint {
   .drag-inner-list {
     overflow-y: scroll;
     height: 100%;
-    max-height: 642px;
+    max-height: 617px;
   }
 }
 
