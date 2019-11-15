@@ -107,7 +107,7 @@ export default {
             ? this.sprintSelected
             : originalPosition;
         copyOfCard.status = copyOfCard.statusCard;
-        await updateCard(card);
+        await updateCard(copyOfCard);
       } catch (err) {
         card.status = originalStatus;
         card.sprintNumber = originalPosition;
