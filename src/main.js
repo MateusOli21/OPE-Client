@@ -20,7 +20,7 @@ const options = {
 Vue.use(VueSweetalert2, options);
 
 routes.beforeEach((to, from, next) => {
-  document.title = "Sistema Gerenciador de OPE";
+  document.title = "Nexus";
   next();
 });
 

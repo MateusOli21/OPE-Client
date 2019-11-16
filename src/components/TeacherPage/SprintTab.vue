@@ -51,7 +51,100 @@ export default {
     SprintTab
   },
   methods: {
-    iniciarSprint() {
+    handleSelectActivities(activities, currentSprintNumber) {
+      const activitiesToShow = [];
+      let iterator = 0;
+      for (const activity of activities) {
+        if (activity.sprintNumber)
+          this.sprintRunningObject[activity.sprintNumber] = true;
+        if (
+          activity.sprintNumber === currentSprintNumber ||
+          activity.sprintNumber === null
+        ) {
+          const activityToPush = {
+            text: activity.title,
+            value: {
+              id: activity.id,
+              title: activity.title,
+              courseId: activity.courseId,
+              sprintNumber: activity.sprintNumber,
+              iterator
+            }
+          };
+          activitiesToShow.push(activityToPush);
+        }
+        iterator++;
+      }
+      return activitiesToShow;
+    },
+    async getCoursesOfGrouping(grouping) {
+      this.currentGrouping = grouping;
+      this.$swal.fire({
+        title: "Agrupando",
+        timer: 4000,
+        onBeforeOpen: () => {
+          this.$swal.showLoading();
+        }
+      });
+      const { data } = await getActivitiesByGrouping(grouping, this.user.email);
+      this.courses = data;
+    },
+    setSprintInActivity(activity) {
+      // activity possui title, id, courseId, sprintNumber, iterator
+      this.activities.push(activity);
+    },
+    async startSprint(sprintNumber, pcsta) {
+      const response = await this.$swal.fire({
+        title: "Você tem certeza que deseja iniciar a sprint?",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sim, eu tenho!",
+        cancelButtonText: "Cancelar"
+      });
+      if (response.value) {
+        try {
+          this.$swal.fire({
+            title: "Iniciando sprint...",
+            timer: 2000,
+            onBeforeOpen: () => {
+              this.$swal.showLoading();
+            }
+          });
+          const sprintInfo = {
+            pcstaId: pcsta._id,
+            activities: this.activities,
+            sprintNumber,
+            isFinished: false
+          };
+          const pcstaPayload = {
+            _id: pcsta._id,
+            title: pcsta.title,
+            courseId: pcsta.courseId,
+            grouping: this.currentGrouping
+          };
+          const sprintStarted = await startSprint(sprintInfo, pcstaPayload);
+          if (sprintStarted.status === 201) {
+            this.sprintRunningObject[sprintNumber] = true;
+            // this.courses[courseIndex].activitiesToResponse[]
+          }
+        } catch (err) {
+          const self = this;
+          showError(
+            self,
+            err,
+            `Não foi possível iniciar a sprint, por favor, tente novamente mais tarde.`
+          );
+        }
+      }
+    },
+    async endSprint(pcstaId, sprintNumber) {
+      const sprintInfo = await getSprintInfo(pcstaId);
+      sprintInfo.isFinished = true;
+      const endedSprint = await endSprint(sprintInfo);
+      if (endedSprint.status === 200)
+        this.sprintRunningObject[sprintNumber] = false;
       return;
     }
   }
