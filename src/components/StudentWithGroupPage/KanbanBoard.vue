@@ -9,7 +9,7 @@
       :sprintSelected.sync="sprintSelected"
       label="Sprint"
     />
-    <KanbanCard
+    <KanbanCards
       v-for="block in blocks"
       :key="block.id"
       :block="block"
@@ -31,7 +31,7 @@ import { updateCard, getSprintInfo, getCards } from "../../services/SprintApi";
 import { getAllPcsta } from "../../services/GroupApi";
 import KanbanHeader from "./KanbanHeader";
 import KanbanFooter from "./KanbanFooter";
-import KanbanCard from "./KanbanCard";
+import KanbanCards from "./KanbanCards";
 import moment from "moment";
 
 export default {
@@ -59,7 +59,7 @@ export default {
   components: {
     KanbanHeader,
     KanbanFooter,
-    KanbanCard
+    KanbanCards
   },
   props: {
     user: Object
