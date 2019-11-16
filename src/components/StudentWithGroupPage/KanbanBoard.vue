@@ -6,8 +6,6 @@
       :key="stage"
       :onchange="getCardsBySprint"
       :currentStage="stage"
-      :sprintStartDate="sprintStartDate"
-      :sprintEndDate="sprintEndDate"
       :sprintSelected.sync="sprintSelected"
       label="Sprint"
     />
@@ -69,8 +67,6 @@ export default {
   data() {
     return {
       sprintSelected: 1,
-      sprintStartDate: "",
-      sprintEndDate: "",
       stages: ["Backlog Global", "Backlog da Sprint"],
       blocks: []
     };
@@ -113,7 +109,9 @@ export default {
           what: `Moveu o cartão para o ${newStage} ${
             newStage === "Backlog Global" ? "" : card.sprintNumber
           }`,
-          when: moment().lang("pt-br").format("L")
+          when: moment()
+            .lang("pt-br")
+            .format("L")
         };
         copyOfCard.historic.unshift(registration);
         await updateCard(copyOfCard);
@@ -154,9 +152,14 @@ li.drag-column.drag-column-Backlog.da.Sprint {
   font-family: Roboto, sans-serif;
 }
 
-.drag-column-header h2 {
-  font-size: 1em;
-  padding: 10px 0 0 10px;
+.drag-column-header {
+  padding-bottom: 0;
+  div.container {
+    padding-bottom: 0;
+  }
+  h2 {
+    font-size: 1em;
+  }
 }
 
 .drag-column {

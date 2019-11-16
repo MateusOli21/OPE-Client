@@ -4,16 +4,14 @@
       <div class="card">
         <p class="display-1 text--primary mt-2">
           Sprint {{sprintNumber}}
-          <small
-            v-if="sprintRunningObject[sprintNumber]"
-            class="isRunning"
-          >Em andamento</small>
+          <small v-if="sprintRunningObject[sprintNumber]">Em andamento</small>
         </p>
         <v-select
           :items="handleSelectActivities(course.activitiesToResponse, sprintNumber)"
           :multiple="true"
           @change="setSprintInActivity"
           filled
+          :value="activitiesObject[sprintNumber]"
           label="Atividades Contínuas"
         ></v-select>
         <div v-for="ac in course.acs" :key="ac">{{ac}}</div>
@@ -62,7 +60,18 @@ export default {
         6: false,
         7: false,
         8: false
-      }
+      },
+      activitiesObject: {
+        1: [],
+        2: [],
+        3: [],
+        4: [],
+        5: [],
+        6: [],
+        7: [],
+        8: []
+      },
+      activities: []
     };
   },
   props: {
@@ -144,11 +153,12 @@ export default {
         }
         iterator++;
       }
+      this.activitiesObject[currentSprintNumber] = activitiesToShow;
       return activitiesToShow;
     },
-    setSprintInActivity(activity) {
-      // activity possui title, id, courseId, sprintNumber, iterator
-      this.activities.push(activity);
+    setSprintInActivity(activities) {
+      const activityIds = activities.map(activity => activity.id);
+      this.activities = activityIds;
     }
   }
 };
