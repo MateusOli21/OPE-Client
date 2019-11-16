@@ -164,7 +164,7 @@ export default {
       // activity possui title, id, courseId, sprintNumber, iterator
       this.activities.push(activity);
     },
-    async startSprint(sprintNumber, pcsta, courseIndex) {
+    async startSprint(sprintNumber, pcsta) {
       const response = await this.$swal.fire({
         title: "Você tem certeza que deseja iniciar a sprint?",
         type: "warning",
@@ -200,7 +200,6 @@ export default {
             this.sprintRunningObject[sprintNumber] = true;
             // this.courses[courseIndex].activitiesToResponse[]
           }
-
         } catch (err) {
           console.log("err:", err);
           const self = this;
@@ -213,10 +212,11 @@ export default {
       }
     },
     async endSprint(pcstaId, sprintNumber) {
-      const sprintInfo = await getSprintInfo(pcstaId)
-      sprintInfo.isFinished = true
-      const endedSprint = await endSprint(sprintInfo)
-      if (endedSprint.status === 200) this.sprintRunningObject[sprintNumber] = false
+      const sprintInfo = await getSprintInfo(pcstaId);
+      sprintInfo.isFinished = true;
+      const endedSprint = await endSprint(sprintInfo);
+      if (endedSprint.status === 200)
+        this.sprintRunningObject[sprintNumber] = false;
       return;
     }
   }

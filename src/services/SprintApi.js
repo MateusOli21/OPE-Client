@@ -20,3 +20,21 @@ export const getSprintInfo = pcstaId => {
     params: { pcstaId }
   });
 };
+
+export const createCard = card => {
+  return axios.post(`${VUE_APP_SPRINT_ENDPOINT}/createCard`, { card });
+};
+
+export const getCards = (groupId, sprintNumber) => {
+  return axios.get(`${VUE_APP_SPRINT_ENDPOINT}/getCards`, {
+    params: { groupId, sprintNumber }});
+};
+
+export const deleteCard = cardId => {
+  return axios.delete(`${VUE_APP_SPRINT_ENDPOINT}/deleteCard`, {
+    params: { cardId }});
+};
+
+export const updateCard = card => {
+  return axios.put(`${VUE_APP_SPRINT_ENDPOINT}/updateCard`, { card });
+};
