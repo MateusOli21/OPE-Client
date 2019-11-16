@@ -40,7 +40,7 @@
 
 <script>
 import { getAllPcsta, getGroups } from "../../services/GroupApi";
-import { showError } from "../../errors/sweetAlertError";
+import { showError } from "../../helpers/sweetAlert";
 import { setObject, getGoogleUserData } from "../../services/LocalForage";
 import GroupTab from "../StudentWithGroupPage/GroupTab";
 

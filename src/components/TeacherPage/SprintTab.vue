@@ -74,7 +74,7 @@ import {
   endSprint,
   getSprintInfo
 } from "../../services/SprintApi";
-import { showError } from "../../errors/sweetAlertError";
+import { showError, showLoader, showWarning } from "../../helpers/sweetAlert";
 
 export default {
   data() {
@@ -105,18 +105,18 @@ export default {
     const user = await getGoogleUserData();
     this.user = JSON.parse(user);
 
-      // if (currentSprintNumber === 1) {
-      //   const sprintsInfo = await getSprintInfo(pcstaId)
-      //   if (sprintsInfo.status === 200) {
-      //     if (typeof sprintsInfo.data === 'array' && Object.keys(sprintsInfo.data).length) {
-      //       sprintsInfo.data.forEach(sprintInfo => {
-      //         this.sprintRunningObject[sprintInfo.sprintNumber] = true
-      //       })
-      //     } else if (typeof sprintsInfo.data !== 'array' && Object.keys(sprintsInfo.data).length) {
-      //       this.sprintRunningObject[sprintsInfo.data.sprintNumber] = true
-      //     }
-      //   }
-      // }
+    // if (currentSprintNumber === 1) {
+    //   const sprintsInfo = await getSprintInfo(pcstaId)
+    //   if (sprintsInfo.status === 200) {
+    //     if (typeof sprintsInfo.data === 'array' && Object.keys(sprintsInfo.data).length) {
+    //       sprintsInfo.data.forEach(sprintInfo => {
+    //         this.sprintRunningObject[sprintInfo.sprintNumber] = true
+    //       })
+    //     } else if (typeof sprintsInfo.data !== 'array' && Object.keys(sprintsInfo.data).length) {
+    //       this.sprintRunningObject[sprintsInfo.data.sprintNumber] = true
+    //     }
+    //   }
+    // }
   },
   components: {
     SprintTab
@@ -150,14 +150,18 @@ export default {
     },
     async getCoursesOfGrouping(grouping) {
       this.currentGrouping = grouping;
-      this.$swal.fire({
-        title: "Agrupando",
-        timer: 4000,
-        onBeforeOpen: () => {
-          this.$swal.showLoading();
-        }
-      });
+      const self = this;
+      showLoader(self, "Agrupando", 4000);
       const { data } = await getActivitiesByGrouping(grouping, this.user.email);
+      if (!data.length)
+        setTimeout(
+          () =>
+            showWarning(
+              self,
+              "No momento não existe nenhuma turma nesse agrupamento."
+            ),
+          1000
+        );
       this.courses = data;
     },
     setSprintInActivity(activity) {
@@ -176,13 +180,8 @@ export default {
       });
       if (response.value) {
         try {
-          this.$swal.fire({
-            title: "Iniciando sprint...",
-            timer: 2000,
-            onBeforeOpen: () => {
-              this.$swal.showLoading();
-            }
-          });
+          const self = this;
+          showLoader(self, "Iniciando sprint...", 2000);
           const sprintInfo = {
             pcstaId: pcsta._id,
             activities: this.activities,
@@ -201,7 +200,6 @@ export default {
             // this.courses[courseIndex].activitiesToResponse[]
           }
         } catch (err) {
-          console.log("err:", err);
           const self = this;
           showError(
             self,
