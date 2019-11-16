@@ -14,10 +14,11 @@
     </v-avatar>
 
     <v-card-actions>
-      <v-btn icon>
+      <v-btn :loading="loading" icon>
         <v-icon @click="deleteCard(block.id)">mdi-delete</v-icon>
       </v-btn>
       <ModalEditCard :onedit="onEditChange" :receivedCard="block" />
+      <ModalCardView :card="block" />
     </v-card-actions>
   </v-card>
 </template>
@@ -25,19 +26,32 @@
 <script>
 import { deleteCard } from "../../services/SprintApi";
 import ModalEditCard from "./ModalEditCard";
+import ModalCardView from "./ModalCardView";
 
 export default {
+  data() {
+    return {
+      loading: false
+    }
+  },
   props: {
     block: Object,
     onchange: Function
   },
   components: {
-    ModalEditCard
+    ModalEditCard,
+    ModalCardView
   },
   methods: {
     async deleteCard(cardId) {
-      await deleteCard(cardId);
-      this.onchange();
+      this.loading = true
+      try {
+        await deleteCard(cardId);
+        setTimeout(() => this.loading = false, 3000)
+        this.onchange();
+      } catch {
+        setTimeout(() => this.loading = false, 3000)
+      }
     },
     onEditChange() {
       this.onchange();
@@ -79,7 +93,7 @@ $border: 1px solid rgba(0, 0, 0, 0.13);
   div.v-card__actions {
     position: relative;
     top: 35px;
-    right: 85px;
+    right: 125px;
   }
 
   .k-red {

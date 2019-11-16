@@ -34,6 +34,7 @@ import { getAllPcsta } from "../../services/GroupApi";
 import KanbanHeader from "./KanbanHeader";
 import KanbanFooter from "./KanbanFooter";
 import KanbanCard from "./KanbanCard";
+import moment from "moment";
 
 export default {
   watch: {
@@ -107,6 +108,14 @@ export default {
             ? this.sprintSelected
             : originalPosition;
         copyOfCard.status = copyOfCard.statusCard;
+        const registration = {
+          who: this.user.username,
+          what: `Moveu o cartão para o ${newStage} ${
+            newStage === "Backlog Global" ? "" : card.sprintNumber
+          }`,
+          when: moment().lang("pt-br").format("L")
+        };
+        copyOfCard.historic.unshift(registration);
         await updateCard(copyOfCard);
       } catch (err) {
         card.status = originalStatus;

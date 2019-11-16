@@ -95,6 +95,7 @@
 import { updateCard } from "../../services/SprintApi";
 import { getMembersByGroupId } from "../../services/AuthApi";
 import { getGoogleUserData } from "../../services/LocalForage";
+import moment from "moment";
 
 const formatMembersList = membersList =>
   membersList.map(member => {
@@ -194,13 +195,21 @@ export default {
           };
         }
         this.card.status = this.card.statusCard;
+        const registration = {
+          who: this.user.username,
+          what: "Editou o cartão",
+          when: moment().lang("pt-br").format("L")
+        };
+        this.card.historic.unshift(registration);
         await updateCard(this.card);
         this.onedit();
-      } catch (err) {}
+      } catch {
+        return;
+      }
     },
     reloadCard() {
       this.$emit("update:receivedCard", this.copyOfOriginalCard);
-      this.card = { ...this.copyOfOriginalCard }
+      this.card = { ...this.copyOfOriginalCard };
     }
   }
 };

@@ -86,6 +86,7 @@
 import { createCard } from "../../services/SprintApi";
 import { getMembersByGroupId } from "../../services/AuthApi";
 import { getGoogleUserData } from "../../services/LocalForage";
+import moment from "moment";
 
 const formatMembersList = membersList =>
   membersList.map(member => {
@@ -190,11 +191,17 @@ export default {
         avatar: this.card.responsibleObject.avatar
       };
       this.card.status = this.card.statusCard
+      const registration = {
+        who: this.user.username,
+        what: 'Criou o cartão',
+        when: moment().lang("pt-br").format('L')
+      }
+      this.card.historic.unshift(registration)
       try {
         await createCard(this.card);
         this.cleanCreateCard();
         this.oncreate();
-      } catch (err) {}
+      } catch { return; }
     }
   }
 };
