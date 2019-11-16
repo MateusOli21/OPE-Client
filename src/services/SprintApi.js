@@ -38,5 +38,3 @@ export const deleteCard = cardId => {
 export const updateCard = card => {
   return axios.put(`${VUE_APP_SPRINT_ENDPOINT}/updateCard`, { card });
 };
-
-
