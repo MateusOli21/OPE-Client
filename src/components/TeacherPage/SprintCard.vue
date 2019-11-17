@@ -122,23 +122,21 @@ export default {
       }
     },
     async endSprint(pcstaId, sprintNumber) {
-      const sprintInfo = await getSprintInfo(pcstaId);
-      sprintInfo.isFinished = true;
-      const endedSprint = await endSprint(sprintInfo);
+      const { data } = await getSprintInfo(pcstaId);
+      data.isFinished = true;
+      const endedSprint = await endSprint(data);
       if (endedSprint.status === 200)
         this.sprintRunningObject[sprintNumber] = false;
       return;
     },
     handleSelectActivities(activities, currentSprintNumber) {
       const activitiesToShow = [];
+      const restOfActivities = [];
       let iterator = 0;
       for (const activity of activities) {
         if (activity.sprintNumber)
           this.sprintRunningObject[activity.sprintNumber] = true;
-        if (
-          activity.sprintNumber === currentSprintNumber ||
-          activity.sprintNumber === null
-        ) {
+        if (activity.sprintNumber === currentSprintNumber) {
           const activityToPush = {
             text: activity.title,
             value: {
@@ -150,15 +148,32 @@ export default {
             }
           };
           activitiesToShow.push(activityToPush);
+        } else if (activity.sprintNumber === null) {
+          const activityToPush = {
+            text: activity.title,
+            value: {
+              id: activity.id,
+              title: activity.title,
+              courseId: activity.courseId,
+              sprintNumber: activity.sprintNumber,
+              iterator
+            }
+          };
+          restOfActivities.push(activityToPush);
         }
         iterator++;
       }
-      this.activitiesObject[currentSprintNumber] = activitiesToShow;
-      return activitiesToShow;
+      if (activitiesToShow.length) {
+        this.activitiesObject[currentSprintNumber] = activitiesToShow;
+        return activitiesToShow;
+      } else {
+        this.activitiesObject[currentSprintNumber] = restOfActivities;
+        return restOfActivities;
+      }
     },
     setSprintInActivity(activities) {
-      const activityIds = activities.map(activity => activity.id);
-      this.activities = activityIds;
+      const selectedActivities = activities.map(activity => activity);
+      this.activities = selectedActivities;
     }
   }
 };

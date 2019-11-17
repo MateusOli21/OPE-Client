@@ -67,17 +67,25 @@ export default {
       } = await getAllPcsta();
       const pcsta = pcstas.find(pcsta => pcsta.courseId === this.user.courseId);
       const { data: sprintInfo } = await getSprintInfo(pcsta._id);
-      if (sprintInfo && sprintInfo.length) {
-        const currentSprintInfo = sprintInfo.find(
-          info => info.sprintNumber === this.sprintSelected
-        );
-        if (currentSprintInfo) {
+      if (sprintInfo || sprintInfo.length) {
+        const currentSprintInfo = sprintInfo.length
+          ? sprintInfo.find(info => info.sprintNumber === this.sprintSelected)
+          : sprintInfo;
+
+        if (
+          currentSprintInfo &&
+          currentSprintInfo.sprintNumber === this.sprintSelected
+        ) {
           this.isFinished = currentSprintInfo.isFinished;
+        } else {
+          this.isFinished = false;
         }
+      } else {
+        this.isFinished = false;
       }
     },
     async getCardsBySprint() {
-      this.getCurrentSprintInfo()
+      await this.getCurrentSprintInfo();
       const { data } = await getCards(this.user.groupId, this.sprintSelected);
       data.forEach(card => {
         card.id = card._id;
