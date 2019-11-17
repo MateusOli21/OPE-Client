@@ -13,7 +13,7 @@
           filled
           :value="activitiesObject[sprintNumber]"
           label="Atividades Contínuas"
-          :disabled="sprintRunningObject[sprintNumber] === 'Finalizada'"
+          :disabled="(sprintRunningObject[sprintNumber] === 'Finalizada') || (sprintRunningObject[sprintNumber] === 'Em execução')"
         ></v-select>
         <div v-for="ac in course.acs" :key="ac">{{ac}}</div>
       </div>
@@ -177,7 +177,6 @@ export default {
       let iterator = 0;
 
       for (const activity of activities) {
-        console.log('activity.sprintNumber === currentSprintNumber:', activity)
         if (activity.sprintNumber === currentSprintNumber) {
           const activityToPush = {
             text: activity.title,
@@ -205,7 +204,7 @@ export default {
         }
         iterator++;
       }
-      console.log('activitiesToShow:', activitiesToShow, 'restOfActivities:', restOfActivities, 'currentSprintNumber:', currentSprintNumber)
+
       if (activitiesToShow.length) {
         this.activitiesObject[currentSprintNumber] = activitiesToShow;
         return activitiesToShow;
