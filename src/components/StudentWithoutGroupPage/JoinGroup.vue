@@ -39,7 +39,7 @@
 <script>
 import { joinGroupByCode } from "../../services/GroupApi";
 import { getGoogleUserData, setObject } from "../../services/LocalForage";
-import { showError } from "../../errors/sweetAlertError";
+import { showError, showLoader } from "../../helpers/sweetAlert";
 
 const updateUserGroupId = async groupId => {
   const user = await getGoogleUserData();
@@ -68,13 +68,8 @@ export default {
   methods: {
     async associate() {
       try {
-        this.$swal.fire({
-          title: "Entrando no grupo",
-          timer: 1000,
-          onBeforeOpen: () => {
-            this.$swal.showLoading();
-          }
-        });
+        const self = this;
+        showLoader(self, "Entrando no grupo", 1000);
         const response = await joinGroupByCode(this.code, this.user.email);
         await updateUserGroupId(response.data.group._id);
         this.$router.push("/grupo-aluno");

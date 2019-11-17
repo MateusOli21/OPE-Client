@@ -1,23 +1,25 @@
 <template>
-  <div>
-    <div>
-      <h2>{{ currentStage }}</h2>
-    </div>
-    <div v-if="currentStage === 'Backlog da Sprint'">
-      <div class="select-sprint">
-        <v-select
-          :items="sprintNumberForSprintSelect"
-          @change="changeSprintNumber"
-          v-model="sprintDefault"
-          :label="label"
-        ></v-select>
-      </div>
-      <div class="dates-of-sprint">
-        <span>Data de início: {{sprintStartDate ? sprintStartDate : '__/__/__'}}</span>
-        <span>Data final: {{sprintEndDate ? sprintEndDate : '__/__/__'}}</span>
-      </div>
-    </div>
-  </div>
+  <v-container>
+    <v-row>
+      <v-col md="12">
+        <h2>{{ currentStage }}</h2>
+        <div v-if="currentStage === 'Backlog da Sprint' && blockedBoard" class="text-right">
+          <small class="red--text">Sprint finalizada</small>
+        </div>
+        <div v-if="currentStage === 'Backlog da Sprint'" class="d-flex justify-end">
+          <div class="select-sprint">
+            <v-select
+              :items="sprintNumberForSprintSelect"
+              @change="changeSprintNumber"
+              v-model="sprintDefault"
+              :label="label"
+            ></v-select>
+          </div>
+        </div>
+      </v-col>
+    </v-row>
+    <div class="blockBoard" v-if="currentStage === 'Backlog da Sprint' && blockedBoard"></div>
+  </v-container>
 </template>
 
 <script>
@@ -34,7 +36,8 @@ export default {
     label: String,
     sprintStartDate: String,
     sprintEndDate: String,
-    onchange: Function
+    onchange: Function,
+    blockedBoard: Boolean
   },
   methods: {
     async changeSprintNumber(sprintNumber) {
@@ -48,15 +51,19 @@ export default {
 
 <style lang="scss">
 .select-sprint {
-  width: 15%;
+  z-index: 99;
+  width: 100%;
   margin-top: 29px;
   h4 {
     font-weight: normal !important;
   }
 }
-.dates-of-sprint {
-  display: flex;
-  width: 440px;
-  justify-content: space-between;
+
+.blockBoard {
+  width: 100%;
+  height: 1000px;
+  position: absolute;
+  right: 0;
+  z-index: 2;
 }
 </style>

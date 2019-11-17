@@ -6,17 +6,17 @@
       :key="stage"
       :onchange="getCardsBySprint"
       :currentStage="stage"
-      :sprintStartDate="sprintStartDate"
-      :sprintEndDate="sprintEndDate"
       :sprintSelected.sync="sprintSelected"
+      :blockedBoard="isFinished"
       label="Sprint"
     />
-    <KanbanCard
+    <KanbanCards
       v-for="block in blocks"
       :key="block.id"
       :block="block"
       :onchange="getCardsBySprint"
       :slot="block.id"
+      :blockedBoard="isFinished"
     />
     <KanbanFooter
       v-for="stage in stages"
@@ -33,26 +33,12 @@ import { updateCard, getSprintInfo, getCards } from "../../services/SprintApi";
 import { getAllPcsta } from "../../services/GroupApi";
 import KanbanHeader from "./KanbanHeader";
 import KanbanFooter from "./KanbanFooter";
-import KanbanCard from "./KanbanCard";
+import KanbanCards from "./KanbanCards";
 import moment from "moment";
 
 export default {
   watch: {
     async user() {
-      const {
-        data: { pcstas }
-      } = await getAllPcsta();
-      const pcsta = pcstas.find(pcsta => pcsta.courseId === this.user.courseId);
-      const { data: sprintInfo } = await getSprintInfo(pcsta._id);
-      if (sprintInfo && sprintInfo.length) {
-        const currentSprintInfo = sprintInfo.find(
-          info => info.sprintNumber === this.sprintSelected
-        );
-        if (currentSprintInfo) {
-          this.sprintStartDate = currentSprintInfo.sprintStartDate;
-          this.sprintEndDate = currentSprintInfo.sprintEndDate;
-        }
-      }
       if (!this.user.isStudent)
         this.stages = ["Backlog Prometido", "Backlog da Sprint"];
       this.getCardsBySprint();
@@ -61,7 +47,7 @@ export default {
   components: {
     KanbanHeader,
     KanbanFooter,
-    KanbanCard
+    KanbanCards
   },
   props: {
     user: Object
@@ -69,14 +55,37 @@ export default {
   data() {
     return {
       sprintSelected: 1,
-      sprintStartDate: "",
-      sprintEndDate: "",
       stages: ["Backlog Global", "Backlog da Sprint"],
-      blocks: []
+      blocks: [],
+      isFinished: false
     };
   },
   methods: {
+    async getCurrentSprintInfo() {
+      const {
+        data: { pcstas }
+      } = await getAllPcsta();
+      const pcsta = pcstas.find(pcsta => pcsta.courseId === this.user.courseId);
+      const { data: sprintInfo } = await getSprintInfo(pcsta._id);
+      if (sprintInfo || sprintInfo.length) {
+        const currentSprintInfo = sprintInfo.length
+          ? sprintInfo.find(info => info.sprintNumber === this.sprintSelected)
+          : sprintInfo;
+
+        if (
+          currentSprintInfo &&
+          currentSprintInfo.sprintNumber === this.sprintSelected
+        ) {
+          this.isFinished = currentSprintInfo.isFinished;
+        } else {
+          this.isFinished = false;
+        }
+      } else {
+        this.isFinished = false;
+      }
+    },
     async getCardsBySprint() {
+      await this.getCurrentSprintInfo();
       const { data } = await getCards(this.user.groupId, this.sprintSelected);
       data.forEach(card => {
         card.id = card._id;
@@ -113,7 +122,9 @@ export default {
           what: `Moveu o cartão para o ${newStage} ${
             newStage === "Backlog Global" ? "" : card.sprintNumber
           }`,
-          when: moment().lang("pt-br").format("L")
+          when: moment()
+            .lang("pt-br")
+            .format("L")
         };
         copyOfCard.historic.unshift(registration);
         await updateCard(copyOfCard);
@@ -154,9 +165,14 @@ li.drag-column.drag-column-Backlog.da.Sprint {
   font-family: Roboto, sans-serif;
 }
 
-.drag-column-header h2 {
-  font-size: 1em;
-  padding: 10px 0 0 10px;
+.drag-column-header {
+  padding-bottom: 0;
+  div.container {
+    padding-bottom: 0;
+  }
+  h2 {
+    font-size: 1em;
+  }
 }
 
 .drag-column {

@@ -9,7 +9,7 @@
 <script>
 import { getGoogleUserData } from "../services/AuthApi";
 import * as LocalForage from "../services/LocalForage";
-import { showError } from "../errors/sweetAlertError";
+import { showError } from "../helpers/sweetAlert";
 
 const getCorrectPathAccordingGoogleUserData = ({ isStudent, groupId }) => {
   let path = "/";

@@ -71,7 +71,7 @@
 <script>
 import { logout } from "../services/AuthApi";
 import { getGoogleUserData, clearStorage } from "../services/LocalForage";
-import { showError } from "../errors/sweetAlertError";
+import { showError } from "../helpers/sweetAlert";
 
 export default {
   data() {

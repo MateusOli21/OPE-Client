@@ -64,7 +64,7 @@
 <script>
 import { createGroup } from "../../services/GroupApi";
 import { getGoogleUserData, setObject } from "../../services/LocalForage";
-import { showError } from "../../errors/sweetAlertError";
+import { showError, showLoader } from "../../helpers/sweetAlert";
 
 const updateUserGroupId = async groupId => {
   const user = await getGoogleUserData();
@@ -113,13 +113,8 @@ export default {
   methods: {
     async create() {
       try {
-        this.$swal.fire({
-          title: "Criando grupo",
-          timer: 1000,
-          onBeforeOpen: () => {
-            this.$swal.showLoading();
-          }
-        });
+        const self = this
+        showLoader(self, "Criando grupo", 1000)
         const response = await createGroup({
           group: {
             groupName: this.groupName,

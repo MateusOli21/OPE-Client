@@ -19,11 +19,6 @@ const options = {
 
 Vue.use(VueSweetalert2, options);
 
-routes.beforeEach((to, from, next) => {
-  document.title = "Nexus";
-  next();
-});
-
 new Vue({
   router: routes,
   vuetify,

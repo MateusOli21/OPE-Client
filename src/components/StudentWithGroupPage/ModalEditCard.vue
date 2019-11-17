@@ -2,7 +2,7 @@
   <div class="modal-edit-card">
     <v-dialog width="30%" v-model="dialog" persistent>
       <template v-slot:activator="{ on }">
-        <v-btn icon v-on="on">
+        <v-btn icon v-on="on" :disabled="disabled">
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
       </template>
@@ -121,7 +121,8 @@ export default {
   },
   props: {
     onedit: Function,
-    receivedCard: Object
+    receivedCard: Object,
+    disabled: Boolean
   },
   data() {
     return {

@@ -98,6 +98,7 @@ div.v-dialog.v-dialog--active.v-bottom-sheet.v-bottom-sheet--inset {
 .card-view {
   height: 1000px;
   border-radius: 100px;
+  z-index: 999999;
   div.container {
     width: 85%;
     position: relative;
