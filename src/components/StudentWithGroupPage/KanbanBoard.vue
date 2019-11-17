@@ -7,6 +7,7 @@
       :onchange="getCardsBySprint"
       :currentStage="stage"
       :sprintSelected.sync="sprintSelected"
+      :blockedBoard="isFinished"
       label="Sprint"
     />
     <KanbanCards
@@ -15,6 +16,7 @@
       :block="block"
       :onchange="getCardsBySprint"
       :slot="block.id"
+      :blockedBoard="isFinished"
     />
     <KanbanFooter
       v-for="stage in stages"
@@ -37,20 +39,6 @@ import moment from "moment";
 export default {
   watch: {
     async user() {
-      const {
-        data: { pcstas }
-      } = await getAllPcsta();
-      const pcsta = pcstas.find(pcsta => pcsta.courseId === this.user.courseId);
-      const { data: sprintInfo } = await getSprintInfo(pcsta._id);
-      if (sprintInfo && sprintInfo.length) {
-        const currentSprintInfo = sprintInfo.find(
-          info => info.sprintNumber === this.sprintSelected
-        );
-        if (currentSprintInfo) {
-          this.sprintStartDate = currentSprintInfo.sprintStartDate;
-          this.sprintEndDate = currentSprintInfo.sprintEndDate;
-        }
-      }
       if (!this.user.isStudent)
         this.stages = ["Backlog Prometido", "Backlog da Sprint"];
       this.getCardsBySprint();
@@ -68,11 +56,28 @@ export default {
     return {
       sprintSelected: 1,
       stages: ["Backlog Global", "Backlog da Sprint"],
-      blocks: []
+      blocks: [],
+      isFinished: false
     };
   },
   methods: {
+    async getCurrentSprintInfo() {
+      const {
+        data: { pcstas }
+      } = await getAllPcsta();
+      const pcsta = pcstas.find(pcsta => pcsta.courseId === this.user.courseId);
+      const { data: sprintInfo } = await getSprintInfo(pcsta._id);
+      if (sprintInfo && sprintInfo.length) {
+        const currentSprintInfo = sprintInfo.find(
+          info => info.sprintNumber === this.sprintSelected
+        );
+        if (currentSprintInfo) {
+          this.isFinished = currentSprintInfo.isFinished;
+        }
+      }
+    },
     async getCardsBySprint() {
+      this.getCurrentSprintInfo()
       const { data } = await getCards(this.user.groupId, this.sprintSelected);
       data.forEach(card => {
         card.id = card._id;

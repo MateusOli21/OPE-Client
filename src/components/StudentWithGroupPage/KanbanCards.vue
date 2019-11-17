@@ -14,10 +14,10 @@
     </v-avatar>
 
     <v-card-actions>
-      <v-btn :loading="loading" icon>
+      <v-btn :loading="loading" :disabled="blockedBoard" icon>
         <v-icon @click="deleteCard(block.id)">mdi-delete</v-icon>
       </v-btn>
-      <ModalEditCard :onedit="onEditChange" :receivedCard="block" />
+      <ModalEditCard :onedit="onEditChange" :disabled="blockedBoard" :receivedCard="block" />
       <ModalCardView :card="block" />
     </v-card-actions>
   </v-card>
@@ -32,11 +32,12 @@ export default {
   data() {
     return {
       loading: false
-    }
+    };
   },
   props: {
     block: Object,
-    onchange: Function
+    onchange: Function,
+    blockedBoard: Boolean
   },
   components: {
     ModalEditCard,
@@ -44,13 +45,13 @@ export default {
   },
   methods: {
     async deleteCard(cardId) {
-      this.loading = true
+      this.loading = true;
       try {
         await deleteCard(cardId);
-        setTimeout(() => this.loading = false, 3000)
+        setTimeout(() => (this.loading = false), 3000);
         this.onchange();
       } catch {
-        setTimeout(() => this.loading = false, 3000)
+        setTimeout(() => (this.loading = false), 3000);
       }
     },
     onEditChange() {
