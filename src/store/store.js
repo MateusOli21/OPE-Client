@@ -8,7 +8,7 @@ export const store = new Vuex.Store({
     teacherSeeGroupDetails: false
   },
   mutations: {
-    teacherSeeGroupDetails(state, teacherSeeGroupDetails) {
+    teacherSeeGroupDetails (state, teacherSeeGroupDetails) {
       state.teacherSeeGroupDetails = teacherSeeGroupDetails
     }
   },
