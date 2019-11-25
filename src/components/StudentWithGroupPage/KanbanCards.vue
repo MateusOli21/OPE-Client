@@ -43,15 +43,6 @@ export default {
     ModalEditCard,
     ModalCardView
   },
-  mounted() {
-    this.$watch(
-      "block",
-      block => {
-        this.onchange();
-      },
-      { immediate: true }
-    );
-  },
   methods: {
     async deleteCard(cardId) {
       this.loading = true;
