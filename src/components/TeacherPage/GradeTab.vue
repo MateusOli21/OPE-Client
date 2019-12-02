@@ -2,7 +2,7 @@
   <v-container class="grey lighten-5 grade">
     <v-row no-gutters>
       <v-col sm="12">
-        <v-card>
+        <v-card class="mt-3">
           <div class="space-between">
             <v-card-title class="title">Critérios de Avaliação</v-card-title>
             <v-btn
