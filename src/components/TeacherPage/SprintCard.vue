@@ -34,7 +34,7 @@
           block
           color="red lighten-2"
           class="white--text"
-          :disabled="sprintRunningObject[sprintNumber] === 'Finalizada'"
+          :disabled="(sprintRunningObject[sprintNumber] === 'Finalizada') || (sprintRunningObject[sprintNumber] === 'Não iniciada')"
           @click="endSprint(course.pcsta._id, sprintNumber)"
         >Finalizar Sprint</v-btn>
       </div>
@@ -58,10 +58,20 @@ export default {
     );
     const copySprintRunningObject = hasRunningObjectInLocalStorage
       ? localStorage.getItem("sprintRunningObject")
-      : this.sprintRunningObject;
-    const formatRunningObject = hasRunningObjectInLocalStorage
-      ? { ...JSON.parse(copySprintRunningObject) }
-      : { ...this.sprintRunningObject };
+      : {
+          1: "",
+          2: "",
+          3: "",
+          4: "",
+          5: "",
+          6: "",
+          7: "",
+          8: ""
+        };
+    const parseObject = hasRunningObjectInLocalStorage
+      ? JSON.parse(copySprintRunningObject)
+      : copySprintRunningObject;
+    const formatRunningObject = { ...parseObject };
 
     if (sprintInfo || sprintInfo.length) {
       const currentSprintInfo = sprintInfo.length
@@ -164,12 +174,24 @@ export default {
       }
     },
     async endSprint(pcstaId, sprintNumber) {
-      const { data } = await getSprintInfo(pcstaId);
-      data.isFinished = true;
-      const endedSprint = await endSprint(data);
-      if (endedSprint.status === 200)
-        this.sprintRunningObject[sprintNumber] = false;
-      return;
+      const { data: sprintInfo } = await getSprintInfo(pcstaId);
+      if (sprintInfo && sprintInfo.length) {
+        const currentSprintInfo =
+          sprintInfo.length > 1
+            ? sprintInfo.find(info => info.sprintNumber === sprintNumber)
+            : sprintInfo[0];
+
+        if (
+          currentSprintInfo &&
+          currentSprintInfo.sprintNumber === sprintNumber
+        ) {
+          currentSprintInfo.isFinished = true;
+          const endedSprint = await endSprint(currentSprintInfo);
+          if (endedSprint.status === 200)
+            this.sprintRunningObject[sprintNumber] = false;
+          return;
+        }
+      }
     },
     handleSelectActivities(activities, currentSprintNumber) {
       const activitiesToShow = [];
@@ -230,6 +252,9 @@ export default {
   div {
     width: 48%;
     button {
+      span {
+        color: white;
+      }
       height: 40px !important;
     }
   }

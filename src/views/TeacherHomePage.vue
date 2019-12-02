@@ -3,6 +3,7 @@
     <MainMenu :tabSelected.sync="tabSelected" />
     <GroupTab v-if="this.tabSelected === 'Grupo'"/>
     <SprintTab v-if="this.tabSelected === 'Sprint'"/>
+    <GradeTab v-if="this.tabSelected === 'Notas'"/>
   </div>
 </template>
 
@@ -10,6 +11,7 @@
 import MainMenu from '../components/MainMenu'
 import GroupTab from '../components/TeacherPage/GroupTab'
 import SprintTab from '../components/TeacherPage/SprintTab'
+import GradeTab from '../components/TeacherPage/GradeTab'
 
 export default {
   data() {
@@ -20,7 +22,8 @@ export default {
   components:{
     MainMenu,
     GroupTab,
-    SprintTab
+    SprintTab,
+    GradeTab
   }
 }
 </script>

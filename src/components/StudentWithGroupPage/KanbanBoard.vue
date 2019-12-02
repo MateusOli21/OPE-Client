@@ -35,6 +35,7 @@ import KanbanHeader from "./KanbanHeader";
 import KanbanFooter from "./KanbanFooter";
 import KanbanCards from "./KanbanCards";
 import moment from "moment";
+import { showError } from "../../helpers/sweetAlert";
 
 export default {
   watch: {
@@ -57,7 +58,8 @@ export default {
       sprintSelected: 1,
       stages: ["Backlog Global", "Backlog da Sprint"],
       blocks: [],
-      isFinished: false
+      isFinished: false,
+      componentKey: 0
     };
   },
   methods: {
@@ -129,8 +131,14 @@ export default {
         copyOfCard.historic.unshift(registration);
         await updateCard(copyOfCard);
       } catch (err) {
-        card.status = originalStatus;
-        card.sprintNumber = originalPosition;
+        const indexOfCard = this.blocks.findIndex(card => card.id === cardId);
+        this.blocks[indexOfCard] = {
+          ...card,
+          status: originalStatus,
+          sprintNumber: originalPosition
+        };
+        const self = this;
+        showError(self, err, "Não foi possível mover o card.");
       }
     },
     getPriorityColor(priority) {
