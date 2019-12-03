@@ -56,7 +56,7 @@ export default {
       try {
         this.currentGrouping = grouping;
         showLoader(self, "Verificando atividades contínuas");
-        const { needToCreate } = await verifyActvitiesByGrouping(grouping, this.user.email)
+        const { data: { needToCreate }} = await verifyActvitiesByGrouping(grouping, this.user.email)
         this.$swal.close()
         if (needToCreate) {
           showLoader(self, "Criando atividades contínuas");

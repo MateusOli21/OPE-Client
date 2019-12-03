@@ -1,12 +1,10 @@
 <template>
-  <KanbanBoard
-    :user="user"
-  />
+  <KanbanBoard :user="user" />
 </template>
 
 <script>
 import { getGoogleUserData } from "../../services/LocalForage";
-import KanbanBoard from './KanbanBoard';
+import KanbanBoard from "./KanbanBoard";
 
 export default {
   async beforeCreate() {
@@ -16,7 +14,7 @@ export default {
   data() {
     return {
       user: {}
-    }
+    };
   },
   components: {
     KanbanBoard
