@@ -64,7 +64,16 @@ export default {
   },
   computed: {
     hasRequiredFieldsVoid() {
-      return this.criterias.some(field => !field.criteria || !field.weight) || !(this.criterias.reduce((accumulator, currentField) => accumulator + Number(currentField.weight), 0) === 100);
+      return (
+        this.criterias.some(field => !field.criteria || !field.weight) ||
+        !(
+          this.criterias.reduce(
+            (accumulator, currentField) =>
+              accumulator + Number(currentField.weight),
+            0
+          ) === 100
+        )
+      );
     }
   },
   methods: {
@@ -82,11 +91,11 @@ export default {
     isNumber(evt, value) {
       evt = evt ? evt : window.event;
       const charCode = evt.which ? evt.which : evt.keyCode;
-      const myValue = value + evt.key 
+      const myValue = value + evt.key;
       if (
-        charCode > 31 &&
-        (charCode < 48 || charCode > 57) &&
-        charCode !== 46 ||
+        (charCode > 31 &&
+          (charCode < 48 || charCode > 57) &&
+          charCode !== 46) ||
         (Number(myValue) > 100 || Number(myValue) < 1)
       ) {
         evt.preventDefault();
@@ -110,8 +119,8 @@ export default {
 }
 
 .title {
-  margin-top: 10px;
-  margin-left: 10px !important;
+  margin-top: 40px !important;
+  margin-left: 30px !important;
   font-size: 1.25rem !important;
   font-weight: 500 !important;
 }

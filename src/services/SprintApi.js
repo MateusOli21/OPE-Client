@@ -36,3 +36,11 @@ export const deleteCard = cardId => {
 export const updateCard = card => {
   return axios.put(`${VUE_APP_SPRINT_ENDPOINT}/updateCard`, { card })
 }
+
+export const verifyActvitiesByGrouping = (grouping, email) => {
+  return axios.get(`${VUE_APP_SPRINT_ENDPOINT}/verifyActvitiesByGrouping`, { params: { grouping, email } })
+}
+
+export const createActivitiesByGrouping = (grouping, email) => {
+  return axios.post(`${VUE_APP_SPRINT_ENDPOINT}/createActivitiesByGrouping`, { grouping, email })
+}
