@@ -26,9 +26,11 @@
 import { getGoogleUserData } from "../../services/LocalForage";
 import { getGradesByStudentEmail, getCriterias } from "../../services/GradeApi";
 import { getSprintInfoById } from "../../services/SprintApi";
+import { showError } from "../../helpers/sweetAlert";
 
 export default {
   async beforeMount() {
+    const self = this;
     try {
       const user = await getGoogleUserData();
       this.user = JSON.parse(user);
@@ -43,30 +45,36 @@ export default {
       this.headers.push(...appendHeader);
       this.headers.push({ text: "Nota Final", value: "sprintGrade" });
       if (grades && grades.length) {
-        const formatedGrades = await grades.map(async grade => {
-          const {
-            data: { sprintNumber }
-          } = await getSprintInfoById(grade.sprintInfoId);
-          const criterias = grade.criterias.map(criteria => {
-            return { [criteria.name]: criteria.grade };
-          });
-          return {
-            sprintNumber,
-            sprintGrade: grade.sprintGrade,
-            ...criterias
-          };
-        });
+        const formatedGrades = await Promise.all(
+          grades.map(async grade => {
+            const {
+              data: { sprintNumber }
+            } = await getSprintInfoById(grade.sprintInfoId);
+            const criterias = grade.criterias.reduce(
+              (accumulator, criteria) => {
+                return { ...accumulator, [criteria.name]: criteria.grade };
+              },
+              {}
+            );
+
+            return {
+              sprintNumber,
+              sprintGrade: grade.sprintGrade,
+              ...criterias
+            };
+          })
+        );
         this.grades = [...formatedGrades];
       }
     } catch (err) {
-      //   console.log(err);
+      showError(self, err, "Ocorreu um erro ao carregar as notas, por favor, tente novamente mais tarde.")
     }
   },
   data() {
     return {
       user: {},
       grades: [],
-      headers: [{ text: "Sprint", value: "sprintNumber" }]
+      headers: [{ text: "Número da sprint", value: "sprintNumber" }]
     };
   }
 };
