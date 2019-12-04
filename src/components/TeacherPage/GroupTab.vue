@@ -34,12 +34,12 @@
       <v-container>
         <v-layout>
           <v-flex>
-            <v-btn color="primary" @click="backToHome" fab small dark>
-              <v-icon>mdi-arrow-left</v-icon>
+            <v-btn color="primary" @click="backToHome" small dark>
+              <v-icon small>mdi-arrow-left</v-icon> Voltar
             </v-btn>
-            <v-btn color="primary" class="f-right" large dark>Sprint</v-btn>
-            <GroupTab :groupId="$store.getters.teacherSeeGroupDetails" />
-            <SprintTab />
+            <v-btn color="primary" class="f-right" @click="toggleComponents" small dark>{{btnText}}</v-btn>
+            <GroupTab :groupId="$store.getters.teacherSeeGroupDetails" v-if="!showSprintTab" />
+            <SprintTab v-if="showSprintTab" />
           </v-flex>
         </v-layout>
       </v-container>
@@ -71,7 +71,9 @@ export default {
         { text: "Detalhes", value: "action", sortable: false }
       ],
       groups: [],
-      pcstas: []
+      pcstas: [],
+      showSprintTab: false,
+      btnText: 'Sprint'
     };
   },
   components: {
@@ -97,6 +99,10 @@ export default {
     }
   },
   methods: {
+    toggleComponents() {
+      this.showSprintTab = !this.showSprintTab
+      this.btnText = this.showSprintTab ? 'Visualizar detalhes do grupo' : 'visualizar quadro kanban'
+    },
     async filterOut(classSelected) {
       const groups = await getGroups(classSelected);
       this.groups = groups.data.groups;
@@ -106,21 +112,17 @@ export default {
       user.groupId = group._id;
       user.courseId = this.pcstas.length ? this.pcstas.find(pcsta => pcsta.title === group.pcsta).courseId : "";
       user.pcsta = group.pcsta;
-      user.isStudent = true;
-      console.log('user:', user, 'group:', group);
       this.$store.commit("teacherSeeGroupDetails", group._id);
       await setObject("googleUserData", JSON.stringify(user));
-      this.actualComponent = "groupTabStudent";
     },
     async backToHome() {
       const user = this.user;
       user.groupId = "";
       user.courseId = "";
       user.pcsta = "";
-      user.isStudent = false;
+      this.toggleComponents()
       this.$store.commit("teacherSeeGroupDetails", false);
       await setObject("googleUserData", JSON.stringify(user));
-      this.actualComponent = "groupTabTeacher";
     }
   }
 };

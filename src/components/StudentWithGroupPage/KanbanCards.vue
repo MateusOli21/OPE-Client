@@ -13,11 +13,11 @@
       <v-img :src="block.responsible.avatar"></v-img>
     </v-avatar>
 
-    <v-card-actions>
-      <v-btn :loading="loading" :disabled="blockedBoard" icon>
+    <v-card-actions :style="isStudent ? '' : 'right: 50px;' ">
+      <v-btn :loading="loading" :disabled="blockedBoard" v-if="isStudent" icon>
         <v-icon @click="deleteCard(block.id)">mdi-delete</v-icon>
       </v-btn>
-      <ModalEditCard :onedit="onEditChange" :disabled="blockedBoard" :receivedCard="block" />
+      <ModalEditCard :onedit="onEditChange" :disabled="blockedBoard" :receivedCard="block" v-if="isStudent" />
       <ModalCardView :card="block" />
     </v-card-actions>
   </v-card>
@@ -37,7 +37,8 @@ export default {
   props: {
     block: Object,
     onchange: Function,
-    blockedBoard: Boolean
+    blockedBoard: Boolean,
+    isStudent: Boolean
   },
   components: {
     ModalEditCard,

@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col md="12">
-        <h2>{{ currentStage }}</h2>
+        <h2>{{ !isStudent ? (currentStage === 'Backlog Global' ? 'Backlog Prometido' : currentStage) : currentStage }}</h2>
         <div v-if="currentStage === 'Backlog da Sprint' && blockedBoard" class="text-right">
           <small class="red--text">Sprint finalizada</small>
         </div>
@@ -18,7 +18,7 @@
         </div>
       </v-col>
     </v-row>
-    <div class="blockBoard" v-if="currentStage === 'Backlog da Sprint' && blockedBoard"></div>
+    <div class="blockBoard" v-if="(currentStage === 'Backlog da Sprint' && blockedBoard) || !isStudent"></div>
   </v-container>
 </template>
 
@@ -37,7 +37,8 @@ export default {
     sprintStartDate: String,
     sprintEndDate: String,
     onchange: Function,
-    blockedBoard: Boolean
+    blockedBoard: Boolean,
+    isStudent: Boolean
   },
   methods: {
     async changeSprintNumber(sprintNumber) {
