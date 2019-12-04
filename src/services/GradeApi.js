@@ -9,6 +9,10 @@ export const upsertCriterias = criterias => {
   return axios.post(`${VUE_APP_GRADE_ENDPOINT}/upsertCriterias`, { criterias })
 }
 
+export const setGroupGrade = (criterias, groupId, sprintInfo, sprintGrade, evaluator) => {
+  return axios.post(`${VUE_APP_GRADE_ENDPOINT}/setGroupGrade`, { criterias, groupId, sprintInfo, sprintGrade, evaluator })
+}
+
 export const getCriterias = () => {
   return axios.get(`${VUE_APP_GRADE_ENDPOINT}/getCriterias`)
 }

@@ -73,7 +73,7 @@ export default {
       groups: [],
       pcstas: [],
       showSprintTab: false,
-      btnText: 'Sprint'
+      btnText: 'Visualizar quadro kanban'
     };
   },
   components: {
@@ -101,7 +101,7 @@ export default {
   methods: {
     toggleComponents() {
       this.showSprintTab = !this.showSprintTab
-      this.btnText = this.showSprintTab ? 'Visualizar detalhes do grupo' : 'visualizar quadro kanban'
+      this.btnText = this.showSprintTab ? 'Visualizar detalhes do grupo' : 'Visualizar quadro kanban'
     },
     async filterOut(classSelected) {
       const groups = await getGroups(classSelected);

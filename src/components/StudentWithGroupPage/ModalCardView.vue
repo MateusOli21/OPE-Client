@@ -124,7 +124,7 @@ div.v-dialog.v-dialog--active.v-bottom-sheet.v-bottom-sheet--inset {
     margin-top: 20px;
     text-align: justify;
     font-size: 0.9em;
-    font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif !important;
+    font-family: Roboto, sans-serif !important;
   }
 }
 

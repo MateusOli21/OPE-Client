@@ -9,6 +9,7 @@
       :sprintSelected.sync="sprintSelected"
       :blockedBoard="isFinished"
       :isStudent="user.isStudent"
+      :sprintInfo="currentSprintInfo"
       label="Sprint"
     />
     <KanbanCards
@@ -60,7 +61,8 @@ export default {
       stages: ["Backlog Global", "Backlog da Sprint"],
       blocks: [],
       isFinished: false,
-      componentKey: 0
+      componentKey: 0,
+      currentSprintInfo: {}
     };
   },
   methods: {
@@ -87,8 +89,10 @@ export default {
           } else {
             this.isFinished = false;
           }
+          this.currentSprintInfo = currentSprintInfo;
         } else {
           this.isFinished = false;
+          this.currentSprintInfo = {}
         }
       } catch (err) {
         showError(self, err, 'Algo deu errado ao trazer as informações da sprint, por favor, tente novamente mais tarde.')
@@ -178,7 +182,7 @@ li.drag-column.drag-column-Backlog.da.Sprint {
 }
 
 .drag-container {
-  font-family: Roboto, sans-serif;
+  font-family: Roboto, sans-serif !important;
 }
 
 .drag-column-header {
