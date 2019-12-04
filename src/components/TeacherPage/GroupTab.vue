@@ -34,10 +34,12 @@
       <v-container>
         <v-layout>
           <v-flex>
-            <v-btn color="info" @click="backToHome" fab small dark>
-              <v-icon>mdi-arrow-left</v-icon>
+            <v-btn color="primary" @click="backToHome" small dark>
+              <v-icon small>mdi-arrow-left</v-icon> Voltar
             </v-btn>
-            <GroupTab :groupId="$store.getters.teacherSeeGroupDetails" />
+            <v-btn color="primary" class="f-right" @click="toggleComponents" small dark>{{btnText}}</v-btn>
+            <GroupTab :groupId="$store.getters.teacherSeeGroupDetails" v-if="!showSprintTab" />
+            <SprintTab v-if="showSprintTab" />
           </v-flex>
         </v-layout>
       </v-container>
@@ -50,6 +52,7 @@ import { getAllPcsta, getGroups } from "../../services/GroupApi";
 import { showError } from "../../helpers/sweetAlert";
 import { setObject, getGoogleUserData } from "../../services/LocalForage";
 import GroupTab from "../StudentWithGroupPage/GroupTab";
+import SprintTab from "../StudentWithGroupPage/SprintTab";
 
 export default {
   data() {
@@ -67,18 +70,25 @@ export default {
         { text: "Turma", value: "pcsta" },
         { text: "Detalhes", value: "action", sortable: false }
       ],
-      groups: []
+      groups: [],
+      pcstas: [],
+      showSprintTab: false,
+      btnText: 'Visualizar quadro kanban'
     };
   },
   components: {
-    GroupTab
+    GroupTab,
+    SprintTab
   },
   async beforeCreate() {
     const user = await getGoogleUserData();
     this.user = JSON.parse(user);
     try {
       const pcstas = await getAllPcsta();
-      this.courses = pcstas.data.pcstas.map(pcsta => pcsta.title);
+      this.pcstas = pcstas.data ? pcstas.data.pcstas : [];
+      this.courses = pcstas.data
+        ? pcstas.data.pcstas.map(pcsta => pcsta.title)
+        : [];
     } catch (err) {
       const self = this;
       showError(
@@ -89,6 +99,10 @@ export default {
     }
   },
   methods: {
+    toggleComponents() {
+      this.showSprintTab = !this.showSprintTab
+      this.btnText = this.showSprintTab ? 'Visualizar detalhes do grupo' : 'Visualizar quadro kanban'
+    },
     async filterOut(classSelected) {
       const groups = await getGroups(classSelected);
       this.groups = groups.data.groups;
@@ -96,20 +110,26 @@ export default {
     async details(group) {
       const user = this.user;
       user.groupId = group._id;
+      user.courseId = this.pcstas.length ? this.pcstas.find(pcsta => pcsta.title === group.pcsta).courseId : "";
+      user.pcsta = group.pcsta;
       this.$store.commit("teacherSeeGroupDetails", group._id);
       await setObject("googleUserData", JSON.stringify(user));
-      this.actualComponent = "groupTabStudent";
     },
     async backToHome() {
       const user = this.user;
       user.groupId = "";
+      user.courseId = "";
+      user.pcsta = "";
+      this.toggleComponents()
       this.$store.commit("teacherSeeGroupDetails", false);
       await setObject("googleUserData", JSON.stringify(user));
-      this.actualComponent = "groupTabTeacher";
     }
   }
 };
 </script>
 
 <style scoped>
+.f-right {
+  float: right;
+}
 </style>

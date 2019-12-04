@@ -2,7 +2,10 @@
   <v-container>
     <v-row>
       <v-col md="12">
-        <h2>{{ currentStage }}</h2>
+        <div class="d-flex space-between">
+          <h2>{{ !isStudent ? (currentStage === 'Backlog Global' ? 'Backlog Prometido' : currentStage) : currentStage }}</h2>
+          <GiveGrade :sprintInfo="sprintInfo" v-if="currentStage === 'Backlog da Sprint' && blockedBoard && !isStudent" />
+        </div>
         <div v-if="currentStage === 'Backlog da Sprint' && blockedBoard" class="text-right">
           <small class="red--text">Sprint finalizada</small>
         </div>
@@ -18,11 +21,16 @@
         </div>
       </v-col>
     </v-row>
-    <div class="blockBoard" v-if="currentStage === 'Backlog da Sprint' && blockedBoard"></div>
+    <div
+      class="blockBoard"
+      v-if="(currentStage === 'Backlog da Sprint' && blockedBoard) || !isStudent"
+    ></div>
   </v-container>
 </template>
 
 <script>
+import GiveGrade from '../TeacherPage/GiveGrade';
+
 export default {
   data() {
     return {
@@ -34,10 +42,13 @@ export default {
     model: Number,
     currentStage: String,
     label: String,
-    sprintStartDate: String,
-    sprintEndDate: String,
     onchange: Function,
-    blockedBoard: Boolean
+    blockedBoard: Boolean,
+    isStudent: Boolean,
+    sprintInfo: Object
+  },
+  components: {
+    GiveGrade
   },
   methods: {
     async changeSprintNumber(sprintNumber) {
@@ -57,6 +68,18 @@ export default {
   h4 {
     font-weight: normal !important;
   }
+}
+
+.d-flex {
+  display: flex;
+}
+
+.space-between {
+  justify-content: space-between;
+}
+
+.bottom-5 {
+  bottom: 5px;
 }
 
 .blockBoard {

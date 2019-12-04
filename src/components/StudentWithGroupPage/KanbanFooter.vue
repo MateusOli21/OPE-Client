@@ -1,7 +1,7 @@
 <template>
   <div class="k-footer">
     <ModalCreateNewCard
-      v-if="stage === 'Backlog Global'"
+      v-if="stage === 'Backlog Global' && isStudent"
       :oncreate="oncreate"
     />
   </div>
@@ -16,7 +16,8 @@ export default {
   },
   props: {
     stage: String,
-    onchange: Function
+    onchange: Function,
+    isStudent: Boolean
   },
   methods: {
     oncreate() {

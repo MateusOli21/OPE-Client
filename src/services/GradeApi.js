@@ -5,12 +5,22 @@ export const updateAny = sprintInfo => {
   return axios.put(`${VUE_APP_GRADE_ENDPOINT}/endSprint`, { sprintInfo })
 }
 
-export const createSome = card => {
-  return axios.post(`${VUE_APP_GRADE_ENDPOINT}/createCard`, { card })
+export const upsertCriterias = criterias => {
+  return axios.post(`${VUE_APP_GRADE_ENDPOINT}/upsertCriterias`, { criterias })
 }
 
-export const getAnyWithParameters = (groupId, sprintNumber) => {
-  return axios.get(`${VUE_APP_GRADE_ENDPOINT}/getCards`, { params: { groupId, sprintNumber } })
+export const setGroupGrade = (criterias, groupId, sprintInfo, sprintGrade, evaluator) => {
+  return axios.post(`${VUE_APP_GRADE_ENDPOINT}/setGroupGrade`, { criterias, groupId, sprintInfo, sprintGrade, evaluator })
+}
+
+export const getCriterias = () => {
+  return axios.get(`${VUE_APP_GRADE_ENDPOINT}/getCriterias`)
+}
+
+export const getGradesByStudentEmail = studentEmail => {
+  return axios.get(`${VUE_APP_GRADE_ENDPOINT}/getGradesByStudentEmail`, {
+    params: { studentEmail }
+  })
 }
 
 export const deleteAny = cardId => {

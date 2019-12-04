@@ -52,59 +52,58 @@ import { showError, showLoader } from "../../helpers/sweetAlert";
 
 export default {
   async beforeMount() {
-    const { data: sprintInfo } = await getSprintInfo(this.course.pcsta._id);
-    const hasRunningObjectInLocalStorage = !!localStorage.getItem(
-      "sprintRunningObject"
-    );
-    const copySprintRunningObject = hasRunningObjectInLocalStorage
-      ? localStorage.getItem("sprintRunningObject")
-      : {
-          1: "",
-          2: "",
-          3: "",
-          4: "",
-          5: "",
-          6: "",
-          7: "",
-          8: ""
-        };
-    const parseObject = hasRunningObjectInLocalStorage
-      ? JSON.parse(copySprintRunningObject)
-      : copySprintRunningObject;
-    const formatRunningObject = { ...parseObject };
+    if (this.reload) {
+      const { data: sprintInfo } = await getSprintInfo(this.course.pcsta._id);
+      const hasRunningObjectInLocalStorage = !!localStorage.getItem(
+        "sprintRunningObject"
+      );
+      const copySprintRunningObject = hasRunningObjectInLocalStorage
+        ? localStorage.getItem("sprintRunningObject")
+        : {
+            1: "",
+            2: "",
+            3: "",
+            4: "",
+            5: "",
+            6: "",
+            7: "",
+            8: ""
+          };
+      const parseObject = hasRunningObjectInLocalStorage
+        ? JSON.parse(copySprintRunningObject)
+        : copySprintRunningObject;
 
-    if (sprintInfo || sprintInfo.length) {
-      const currentSprintInfo = sprintInfo.length
-        ? sprintInfo.find(info => info.sprintNumber === this.sprintNumber)
-        : sprintInfo;
+      const formatRunningObject = { ...parseObject };
 
-      if (currentSprintInfo) {
-        if (currentSprintInfo.sprintNumber === this.sprintNumber) {
-          let value;
-          if (
-            !currentSprintInfo.isFinished &&
-            currentSprintInfo.activities.length
-          )
-            value = "Em execução";
-          if (currentSprintInfo.isFinished) value = "Finalizada";
+      if (sprintInfo) {
+        const currentSprintInfo = sprintInfo.length
+          ? sprintInfo.find(info => info.sprintNumber === this.sprintNumber)
+          : sprintInfo;
+
+        if (currentSprintInfo) {
+          if (currentSprintInfo.sprintNumber === this.sprintNumber) {
+            let value = "Não iniciada";
+            if (!currentSprintInfo.isFinished) value = "Em execução";
+            if (currentSprintInfo.isFinished) value = "Finalizada";
+            this.sprintRunningObject = {
+              ...formatRunningObject,
+              [this.sprintNumber]: value
+            };
+            localStorage.setItem(
+              "sprintRunningObject",
+              JSON.stringify(this.sprintRunningObject)
+            );
+          }
+        } else {
           this.sprintRunningObject = {
             ...formatRunningObject,
-            [this.sprintNumber]: value
+            [this.sprintNumber]: "Não iniciada"
           };
           localStorage.setItem(
             "sprintRunningObject",
             JSON.stringify(this.sprintRunningObject)
           );
         }
-      } else {
-        this.sprintRunningObject = {
-          ...formatRunningObject,
-          [this.sprintNumber]: "Não iniciada"
-        };
-        localStorage.setItem(
-          "sprintRunningObject",
-          JSON.stringify(this.sprintRunningObject)
-        );
       }
     }
   },
@@ -113,7 +112,18 @@ export default {
   },
   data() {
     return {
-      sprintRunningObject: localStorage.getItem("sprintRunningObject"),
+      sprintRunningObject: localStorage.getItem("sprintRunningObject")
+        ? JSON.parse(localStorage.getItem("sprintRunningObject"))
+        : {
+            1: "Não Iniciada",
+            2: "Não Iniciada",
+            3: "Não Iniciada",
+            4: "Não Iniciada",
+            5: "Não Iniciada",
+            6: "Não Iniciada",
+            7: "Não Iniciada",
+            8: "Não Iniciada"
+          },
       activitiesObject: {
         1: [],
         2: [],
@@ -130,7 +140,9 @@ export default {
   props: {
     sprintNumber: Number,
     courseIndex: Number,
-    course: Object
+    course: Object,
+    grouping: String,
+    reload: Boolean
   },
   methods: {
     async startSprint(sprintNumber, pcsta) {
@@ -157,11 +169,22 @@ export default {
             _id: pcsta._id,
             title: pcsta.title,
             courseId: pcsta.courseId,
-            grouping: this.currentGrouping
+            grouping: this.grouping
           };
           const sprintStarted = await startSprint(sprintInfo, pcstaPayload);
           if (sprintStarted.status === 201) {
-            this.sprintRunningObject[sprintNumber] = "Em execução";
+            this.$swal.close();
+            const sprintRunningObject = JSON.parse(
+              localStorage.getItem("sprintRunningObject")
+            );
+            const newSprintRunningObject = {
+              ...sprintRunningObject,
+              [sprintNumber]: "Em execução"
+            };
+            localStorage.setItem(
+              "sprintRunningObject",
+              JSON.stringify(newSprintRunningObject)
+            );
           }
         } catch (err) {
           const self = this;
@@ -187,8 +210,19 @@ export default {
         ) {
           currentSprintInfo.isFinished = true;
           const endedSprint = await endSprint(currentSprintInfo);
-          if (endedSprint.status === 200)
-            this.sprintRunningObject[sprintNumber] = false;
+          if (endedSprint.status === 200) {
+            const sprintRunningObject = JSON.parse(
+              localStorage.getItem("sprintRunningObject")
+            );
+            const newSprintRunningObject = {
+              ...sprintRunningObject,
+              [sprintNumber]: "Finalizada"
+            };
+            localStorage.setItem(
+              "sprintRunningObject",
+              JSON.stringify(newSprintRunningObject)
+            );
+          }
           return;
         }
       }

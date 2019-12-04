@@ -8,6 +8,8 @@
       :currentStage="stage"
       :sprintSelected.sync="sprintSelected"
       :blockedBoard="isFinished"
+      :isStudent="user.isStudent"
+      :sprintInfo="currentSprintInfo"
       label="Sprint"
     />
     <KanbanCards
@@ -17,6 +19,7 @@
       :onchange="getCardsBySprint"
       :slot="block.id"
       :blockedBoard="isFinished"
+      :isStudent="user.isStudent"
     />
     <KanbanFooter
       v-for="stage in stages"
@@ -24,6 +27,7 @@
       :slot="`footer-${stage}`"
       :stage="stage"
       :onchange="getCardsBySprint"
+      :isStudent="user.isStudent"
     />
   </kanban-board>
 </template>
@@ -40,8 +44,6 @@ import { showError } from "../../helpers/sweetAlert";
 export default {
   watch: {
     async user() {
-      if (!this.user.isStudent)
-        this.stages = ["Backlog Prometido", "Backlog da Sprint"];
       this.getCardsBySprint();
     }
   },
@@ -59,31 +61,41 @@ export default {
       stages: ["Backlog Global", "Backlog da Sprint"],
       blocks: [],
       isFinished: false,
-      componentKey: 0
+      componentKey: 0,
+      currentSprintInfo: {}
     };
   },
   methods: {
     async getCurrentSprintInfo() {
-      const {
-        data: { pcstas }
-      } = await getAllPcsta();
-      const pcsta = pcstas.find(pcsta => pcsta.courseId === this.user.courseId);
-      const { data: sprintInfo } = await getSprintInfo(pcsta._id);
-      if (sprintInfo || sprintInfo.length) {
-        const currentSprintInfo = sprintInfo.length
-          ? sprintInfo.find(info => info.sprintNumber === this.sprintSelected)
-          : sprintInfo;
+      const self = this;
+      try {
+        const {
+          data: { pcstas }
+        } = await getAllPcsta();
+        const pcsta = pcstas.find(
+          pcsta => pcsta.courseId === this.user.courseId
+        );
+        const { data: sprintInfo } = await getSprintInfo(pcsta._id);
+        if (sprintInfo || sprintInfo.length) {
+          const currentSprintInfo = sprintInfo.length
+            ? sprintInfo.find(info => info.sprintNumber === this.sprintSelected)
+            : sprintInfo;
 
-        if (
-          currentSprintInfo &&
-          currentSprintInfo.sprintNumber === this.sprintSelected
-        ) {
-          this.isFinished = currentSprintInfo.isFinished;
+          if (
+            currentSprintInfo &&
+            currentSprintInfo.sprintNumber === this.sprintSelected
+          ) {
+            this.isFinished = currentSprintInfo.isFinished;
+          } else {
+            this.isFinished = false;
+          }
+          this.currentSprintInfo = currentSprintInfo;
         } else {
           this.isFinished = false;
+          this.currentSprintInfo = {}
         }
-      } else {
-        this.isFinished = false;
+      } catch (err) {
+        showError(self, err, 'Algo deu errado ao trazer as informações da sprint, por favor, tente novamente mais tarde.')
       }
     },
     async getCardsBySprint() {
@@ -170,7 +182,7 @@ li.drag-column.drag-column-Backlog.da.Sprint {
 }
 
 .drag-container {
-  font-family: Roboto, sans-serif;
+  font-family: Roboto, sans-serif !important;
 }
 
 .drag-column-header {

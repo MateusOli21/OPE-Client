@@ -9,10 +9,9 @@ export const showError = (self, err, message) =>
     footer: `<small>Erro: ${err}</small>`
   })
 
-export const showLoader = (self, message, time) => {
+export const showLoader = (self, message) => {
   self.$swal.fire({
     title: message,
-    timer: time,
     onBeforeOpen: () => {
       self.$swal.showLoading()
     }

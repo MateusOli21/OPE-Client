@@ -5,22 +5,16 @@
         <v-img
           src="https://www.impacta.edu.br/themes/wc_agenciar3/images/logo-new.png"
           height="50"
-          width="200"
+          width="150"
         ></v-img>
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
-      <span style="margin-right: 15px; color: white;">{{user.username}}</span>
       <v-menu offset-y>
         <template v-slot:activator="{on}">
-          <v-btn
-            fab
-            small
-            text
-            dark
-            slot="activator"
-            v-on="on"
-          ><v-img style="border-radius: 35px; width: 30px" :src="user.avatar" /></v-btn>
+          <v-btn fab small text dark slot="activator" v-on="on">
+            <v-img style="border-radius: 35px; width: 30px" :src="user.avatar" />
+          </v-btn>
         </template>
 
         <v-card width="300">
@@ -33,7 +27,7 @@
 
             <v-list-item>
               <v-list-item-content>
-                <v-list-item-title class="title pb-2">{{user.username}}</v-list-item-title>
+                <v-list-item-title class="pb-2">{{user.username}}</v-list-item-title>
 
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on: tooltip }">
@@ -44,9 +38,9 @@
 
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on: tooltip }">
-                    <v-list-item-subtitle v-on="{ ...tooltip}">{{course}}</v-list-item-subtitle>
+                    <v-list-item-subtitle style="margin-top: 9px; margin-bottom: 0;" v-on="{ ...tooltip}">{{course}}</v-list-item-subtitle>
                   </template>
-                  <span >{{course}}</span>
+                  <span>{{course}}</span>
                 </v-tooltip>
               </v-list-item-content>
             </v-list-item>
@@ -80,8 +74,8 @@ export default {
     };
   },
   computed: {
-    course(){
-      return this.user.pcsta ? this.user.pcsta.split("- ")[1] : ""
+    course() {
+      return this.user.pcsta ? this.user.pcsta : "";
     }
   },
   methods: {
@@ -102,7 +96,7 @@ export default {
   },
   async created() {
     const user = await getGoogleUserData();
-    this.user = JSON.parse(user)
+    this.user = JSON.parse(user);
   }
 };
 </script>
@@ -113,7 +107,7 @@ export default {
   text-decoration: none;
 }
 
-.avatar{
+.avatar {
   float: left;
   padding-top: 15px;
 }

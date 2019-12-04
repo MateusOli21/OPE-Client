@@ -78,11 +78,7 @@
                 :hide-default-footer="true"
                 class="memberTable"
               >
-                <template v-slot:item.username="{ item }">
-                  {{ item.username }}
-                  <v-icon v-if="item.email === group.owner" x-small>mdi-star</v-icon>
-                </template>
-                <template v-slot:item.email="{ item }" class="emailColumn">{{ item.email }}</template>
+                <template v-slot:item.email="{ item }" class="emailColumn">{{ item.email }} <v-icon v-if="item.email === group.owner" x-small>mdi-star</v-icon></template>
                 <template v-slot:item.actionPassOwner="{ item }">
                   <v-icon
                     x-medium
@@ -140,11 +136,6 @@ export default {
       dialog: false,
       user: "",
       headers: [
-        {
-          text: "Nome",
-          align: "left",
-          value: "username"
-        },
         { text: "E-mail", value: "email" },
         { text: "Passar Liderança", value: "actionPassOwner", sortable: false },
         { text: "Remover", value: "actionRemove", sortable: false }

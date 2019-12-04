@@ -2,7 +2,7 @@
   <v-container class="grey lighten-5 grade">
     <v-row no-gutters>
       <v-col sm="12">
-        <v-card>
+        <v-card class="mt-3">
           <div class="space-between">
             <v-card-title class="title">Critérios de Avaliação</v-card-title>
             <v-btn
@@ -10,6 +10,7 @@
               class="save-criterias"
               :disabled="hasRequiredFieldsVoid"
               @click="saveCriterias"
+              :loading="isLoading"
             >Salvar</v-btn>
           </div>
           <v-container class="lighten-5">
@@ -19,7 +20,7 @@
                   outlined
                   label="Critério"
                   prepend-icon="mdi-playlist-check"
-                  v-model="criteria.criteria"
+                  v-model="criteria.name"
                   required
                 ></v-text-field>
                 <v-tooltip left>
@@ -51,42 +52,62 @@
 </template>
 
 <script>
+import { upsertCriterias, getCriterias } from "../../services/GradeApi";
+
 export default {
+  async beforeCreate() {
+    const { data } = await getCriterias();
+    this.criterias = data
+  },
   data() {
     return {
       criterias: [
         {
-          criteria: "",
+          name: "",
           weight: ""
         }
-      ]
+      ],
+      isLoading: false
     };
   },
   computed: {
     hasRequiredFieldsVoid() {
-      return this.criterias.some(field => !field.criteria || !field.weight) || !(this.criterias.reduce((accumulator, currentField) => accumulator + Number(currentField.weight), 0) === 100);
+      if (this.criterias.length) {
+        return (
+          this.criterias.some(field => !field.name || !field.weight) ||
+          !(
+            this.criterias.reduce(
+              (accumulator, currentField) =>
+                accumulator + Number(currentField.weight),
+              0
+            ) === 100
+          )
+        );
+      }
+      return true
     }
   },
   methods: {
     createAnotherCriterion() {
       const myCriteria = {
-        criteria: "",
+        name: "",
         weight: ""
       };
       this.criterias.push(myCriteria);
     },
-    saveCriterias() {
-      // call route in backend
-      return;
+    async saveCriterias() {
+      this.isLoading = true
+      await upsertCriterias(this.criterias);
+      setTimeout(() => this.isLoading = false, 1000)
     },
     isNumber(evt, value) {
       evt = evt ? evt : window.event;
       const charCode = evt.which ? evt.which : evt.keyCode;
-      const myValue = value + evt.key 
+      const myValue = value + evt.key;
       if (
-        charCode > 31 &&
-        (charCode < 48 || charCode > 57) &&
-        charCode !== 46 ||
+        (charCode > 31 &&
+          (charCode < 48 || charCode > 57) &&
+          charCode !== 46) ||
         (Number(myValue) > 100 || Number(myValue) < 1)
       ) {
         evt.preventDefault();
@@ -110,8 +131,8 @@ export default {
 }
 
 .title {
-  margin-top: 10px;
-  margin-left: 10px !important;
+  margin-top: 40px !important;
+  margin-left: 30px !important;
   font-size: 1.25rem !important;
   font-weight: 500 !important;
 }
@@ -123,7 +144,7 @@ export default {
 
 .save-criterias {
   color: white !important;
-  margin: 20px 20px 0 0;
+  margin: 50px 40px 0 0;
   width: 14%;
 }
 

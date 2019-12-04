@@ -1,7 +1,7 @@
 <template>
   <div>
     <template>
-      <v-container class="menu">
+      <v-container style="position: relative; left: 187px;" class="menu">
         <v-row no-gutters align="center">
           <v-col v-for="(menu, index) in menuItem" :key="index" cols="12" sm="4">
             <v-btn
