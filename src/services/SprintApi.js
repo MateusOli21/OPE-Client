@@ -21,6 +21,12 @@ export const getSprintInfo = pcstaId => {
   })
 }
 
+export const getSprintInfoById = sprintInfoId => {
+  return axios.get(`${VUE_APP_SPRINT_ENDPOINT}/getSprintInfoById`, {
+    params: { sprintInfoId }
+  })
+}
+
 export const createCard = card => {
   return axios.post(`${VUE_APP_SPRINT_ENDPOINT}/createCard`, { card })
 }
