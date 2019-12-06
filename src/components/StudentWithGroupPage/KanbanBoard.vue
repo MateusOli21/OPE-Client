@@ -90,7 +90,7 @@ export default {
       cardsNow.forEach(card => {
         card.id = card._id;
         card.statusCard = card.status;
-        card.status = "Backlog da Sprint";
+        card.status = card.sprintNumber ? "Backlog da Sprint" : "";
         card.responsibleAvatar = card.responsible.avatar;
       });
       data.forEach(card => {

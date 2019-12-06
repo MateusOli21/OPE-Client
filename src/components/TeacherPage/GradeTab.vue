@@ -14,8 +14,13 @@
             >Salvar</v-btn>
           </div>
           <v-container class="lighten-5">
-            <v-row no-gutters class="center-x-col" v-for="criteria in criterias" :key="criteria.id">
+            <v-row no-gutters class="center-x-col" v-for="(criteria, index) in criterias" :key="criteria.id">
               <div class="criteria-container">
+                <div class="text-right close-button">
+                  <v-btn icon small color="red" @click="deleteCriterion(index)">
+                    <v-icon>mdi-close</v-icon>
+                  </v-btn>
+                </div>
                 <v-text-field
                   outlined
                   label="Critério"
@@ -57,7 +62,7 @@ import { upsertCriterias, getCriterias } from "../../services/GradeApi";
 export default {
   async beforeCreate() {
     const { data } = await getCriterias();
-    this.criterias = data
+    this.criterias = data;
   },
   data() {
     return {
@@ -84,7 +89,7 @@ export default {
           )
         );
       }
-      return true
+      return true;
     }
   },
   methods: {
@@ -95,10 +100,13 @@ export default {
       };
       this.criterias.push(myCriteria);
     },
+    deleteCriterion(index) {
+      this.criterias = this.criterias.filter((element, i) => i !== index);
+    },
     async saveCriterias() {
-      this.isLoading = true
+      this.isLoading = true;
       await upsertCriterias(this.criterias);
-      setTimeout(() => this.isLoading = false, 1000)
+      setTimeout(() => (this.isLoading = false), 1000);
     },
     isNumber(evt, value) {
       evt = evt ? evt : window.event;
@@ -153,5 +161,11 @@ export default {
   width: 60%;
   border: 1.4px dashed grey;
   margin-bottom: 20px;
+}
+
+.close-button {
+  position: relative;
+  bottom: 23px;
+  left: 25px;
 }
 </style>

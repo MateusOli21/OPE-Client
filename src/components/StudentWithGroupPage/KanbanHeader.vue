@@ -9,7 +9,7 @@
         <div v-if="currentStage === 'Backlog da Sprint' && blockedBoard" class="text-right">
           <small class="red--text">Sprint finalizada</small>
         </div>
-        <ModalCardsBlocked :cards="handleCards(cards, currentStage)"/>
+        <ModalCardsBlocked v-if="blockedBoard || !isStudent" :cards="handleCards(cards, currentStage)"/>
         <div v-if="currentStage === 'Backlog da Sprint'" class="d-flex justify-end">
           <div class="select-sprint">
             <v-select
