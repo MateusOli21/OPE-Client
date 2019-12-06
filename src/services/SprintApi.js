@@ -50,3 +50,7 @@ export const verifyActvitiesByGrouping = (grouping, email) => {
 export const createActivitiesByGrouping = (grouping, email) => {
   return axios.post(`${VUE_APP_SPRINT_ENDPOINT}/createActivitiesByGrouping`, { grouping, email })
 }
+
+export const getReviewBacklog = (groupId, sprintNumber) => {
+  return axios.get(`${VUE_APP_SPRINT_ENDPOINT}/getReviewBacklog`, { params: { groupId, sprintNumber } })
+}

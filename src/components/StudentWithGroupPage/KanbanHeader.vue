@@ -3,7 +3,7 @@
     <v-row>
       <v-col md="12">
         <div class="d-flex space-between">
-          <h2>{{ !isStudent ? (currentStage === 'Backlog Global' ? 'Backlog Prometido' : currentStage) : currentStage }}</h2>
+          <h2>{{ currentStage }}</h2>
           <GiveGrade :sprintInfo="sprintInfo" v-if="currentStage === 'Backlog da Sprint' && blockedBoard && !isStudent" />
         </div>
         <div v-if="currentStage === 'Backlog da Sprint' && blockedBoard" class="text-right">
