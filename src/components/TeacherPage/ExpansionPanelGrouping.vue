@@ -2,10 +2,8 @@
   <v-expansion-panels :popout="true" :focusable="true" float="left">
     <v-expansion-panel v-for="course in courses" :key="course.pcsta._id">
       <v-expansion-panel-header>{{course.pcsta.title}}</v-expansion-panel-header>
-      <v-expansion-panel-content>
+      <v-expansion-panel-content v-for="sprintNumber in sprints" :key="sprintNumber.key">
         <SprintCard
-          v-for="sprintNumber in sprints"
-          :key="sprintNumber.key"
           :sprint="handleSprint(sprintNumber, course.pcsta._id)"
           :grouping="currentGrouping"
           :update="update"
@@ -49,7 +47,7 @@ export default {
             )
           : sprintInfoOfPcsta.sprintInfos;
 
-        if (currentSprintInfo) {
+        if (currentSprintInfo && currentSprintInfo.sprintNumber) {
           if (currentSprintInfo.sprintNumber === sprintNumber) {
             const sprint = {
               status: "Não iniciada",
@@ -69,7 +67,7 @@ export default {
       }
     },
     update() {
-      this.updateComponent()
+      this.updateComponent();
     }
   }
 };
