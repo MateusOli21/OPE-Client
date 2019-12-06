@@ -10,6 +10,7 @@
       :blockedBoard="isFinished"
       :isStudent="user.isStudent"
       :sprintInfo="currentSprintInfo"
+      :cards="blocks"
       label="Sprint"
     />
     <KanbanCards
