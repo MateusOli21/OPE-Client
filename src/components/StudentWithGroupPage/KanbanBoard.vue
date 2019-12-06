@@ -10,6 +10,7 @@
       :blockedBoard="isFinished"
       :isStudent="user.isStudent"
       :sprintInfo="currentSprintInfo"
+      :cards="blocks"
       label="Sprint"
     />
     <KanbanCards
@@ -33,7 +34,12 @@
 </template>
 
 <script>
-import { updateCard, getSprintInfo, getCards } from "../../services/SprintApi";
+import {
+  updateCard,
+  getSprintInfo,
+  getCards,
+  getReviewBacklog
+} from "../../services/SprintApi";
 import { getAllPcsta } from "../../services/GroupApi";
 import KanbanHeader from "./KanbanHeader";
 import KanbanFooter from "./KanbanFooter";
@@ -44,7 +50,12 @@ import { showError } from "../../helpers/sweetAlert";
 export default {
   watch: {
     async user() {
-      this.getCardsBySprint();
+      if (!this.user.isStudent) {
+        this.stages[0] = "Backlog Prometido";
+        this.getCardsOfReviewBacklog();
+      } else {
+        this.getCardsBySprint();
+      }
     }
   },
   components: {
@@ -66,6 +77,30 @@ export default {
     };
   },
   methods: {
+    async getCardsOfReviewBacklog() {
+      await this.getCurrentSprintInfo();
+      const { data } = await getReviewBacklog(
+        this.user.groupId,
+        this.sprintSelected
+      );
+      const { data: cardsNow } = await getCards(
+        this.user.groupId,
+        this.sprintSelected
+      );
+      cardsNow.forEach(card => {
+        card.id = card._id;
+        card.statusCard = card.status;
+        card.status = card.sprintNumber ? "Backlog da Sprint" : "";
+        card.responsibleAvatar = card.responsible.avatar;
+      });
+      data.forEach(card => {
+        card.id += card._id;
+        card.statusCard = card.status;
+        card.status = "Backlog Prometido";
+        card.responsibleAvatar = card.responsible.avatar;
+      });
+      this.blocks = [...data, ...cardsNow];
+    },
     async getCurrentSprintInfo() {
       const self = this;
       try {
@@ -92,10 +127,14 @@ export default {
           this.currentSprintInfo = currentSprintInfo;
         } else {
           this.isFinished = false;
-          this.currentSprintInfo = {}
+          this.currentSprintInfo = {};
         }
       } catch (err) {
-        showError(self, err, 'Algo deu errado ao trazer as informações da sprint, por favor, tente novamente mais tarde.')
+        showError(
+          self,
+          err,
+          "Algo deu errado ao trazer as informações da sprint, por favor, tente novamente mais tarde."
+        );
       }
     },
     async getCardsBySprint() {

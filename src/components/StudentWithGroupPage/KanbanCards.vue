@@ -18,7 +18,7 @@
         <v-icon @click="deleteCard(block.id)">mdi-delete</v-icon>
       </v-btn>
       <ModalEditCard :onedit="onEditChange" :disabled="blockedBoard" :receivedCard="block" v-if="isStudent" />
-      <ModalCardView :card="block" />
+      <ModalCardView :card="block" v-if="isStudent" :disabled="blockedBoard" />
     </v-card-actions>
   </v-card>
 </template>

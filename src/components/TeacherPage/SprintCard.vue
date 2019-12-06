@@ -1,19 +1,19 @@
 <template>
-  <v-card class="mx-auto mt-5" max-width="100%">
+  <v-card class="mx-auto mt-5" max-width="100%" v-if="sprint">
     <v-card-text class="pb-0">
       <div class="card">
         <p class="display-1 text--primary mt-2">
-          Sprint {{sprintNumber}}
-          <small class="status-sprint">{{sprintRunningObject[sprintNumber]}}</small>
+          Sprint {{sprint.number}}
+          <small class="status-sprint">{{sprint.status}}</small>
         </p>
         <v-select
-          :items="handleSelectActivities(course.activitiesToResponse, sprintNumber)"
+          :items="handleSelectActivities(course.activitiesToResponse, sprint.number)"
           :multiple="true"
           @change="setSprintInActivity"
           filled
-          :value="activitiesObject[sprintNumber]"
+          :value="activitiesObject[sprint.number]"
           label="Atividades Contínuas"
-          :disabled="(sprintRunningObject[sprintNumber] === 'Finalizada') || (sprintRunningObject[sprintNumber] === 'Em execução')"
+          :disabled="sprint.status === 'Finalizada' || sprint.status === 'Em execução'"
         ></v-select>
         <div v-for="ac in course.acs" :key="ac">{{ac}}</div>
       </div>
@@ -24,8 +24,8 @@
           block
           color="teal lighten-1"
           class="mt-2 mb-2"
-          :disabled="(sprintRunningObject[sprintNumber] === 'Finalizada') || (sprintRunningObject[sprintNumber] === 'Em execução')"
-          @click="startSprint(sprintNumber, course.pcsta, courseIndex)"
+          :disabled="sprint.status === 'Finalizada' || sprint.status === 'Em execução'"
+          @click="startSprint(sprint.number, course.pcsta)"
         >Iniciar Sprint</v-btn>
       </div>
       <div>
@@ -34,8 +34,8 @@
           block
           color="red lighten-2"
           class="white--text"
-          :disabled="(sprintRunningObject[sprintNumber] === 'Finalizada') || (sprintRunningObject[sprintNumber] === 'Não iniciada')"
-          @click="endSprint(course.pcsta._id, sprintNumber)"
+          :disabled="sprint.status === 'Finalizada' || sprint.status === 'Não iniciada'"
+          @click="endSprint(course.pcsta._id, sprint.number)"
         >Finalizar Sprint</v-btn>
       </div>
     </v-card-actions>
@@ -51,79 +51,8 @@ import {
 import { showError, showLoader } from "../../helpers/sweetAlert";
 
 export default {
-  async beforeMount() {
-    if (this.reload) {
-      const { data: sprintInfo } = await getSprintInfo(this.course.pcsta._id);
-      const hasRunningObjectInLocalStorage = !!localStorage.getItem(
-        "sprintRunningObject"
-      );
-      const copySprintRunningObject = hasRunningObjectInLocalStorage
-        ? localStorage.getItem("sprintRunningObject")
-        : {
-            1: "",
-            2: "",
-            3: "",
-            4: "",
-            5: "",
-            6: "",
-            7: "",
-            8: ""
-          };
-      const parseObject = hasRunningObjectInLocalStorage
-        ? JSON.parse(copySprintRunningObject)
-        : copySprintRunningObject;
-
-      const formatRunningObject = { ...parseObject };
-
-      if (sprintInfo) {
-        const currentSprintInfo = sprintInfo.length
-          ? sprintInfo.find(info => info.sprintNumber === this.sprintNumber)
-          : sprintInfo;
-
-        if (currentSprintInfo) {
-          if (currentSprintInfo.sprintNumber === this.sprintNumber) {
-            let value = "Não iniciada";
-            if (!currentSprintInfo.isFinished) value = "Em execução";
-            if (currentSprintInfo.isFinished) value = "Finalizada";
-            this.sprintRunningObject = {
-              ...formatRunningObject,
-              [this.sprintNumber]: value
-            };
-            localStorage.setItem(
-              "sprintRunningObject",
-              JSON.stringify(this.sprintRunningObject)
-            );
-          }
-        } else {
-          this.sprintRunningObject = {
-            ...formatRunningObject,
-            [this.sprintNumber]: "Não iniciada"
-          };
-          localStorage.setItem(
-            "sprintRunningObject",
-            JSON.stringify(this.sprintRunningObject)
-          );
-        }
-      }
-    }
-  },
-  beforeDestroy() {
-    localStorage.removeItem("sprintRunningObject");
-  },
   data() {
     return {
-      sprintRunningObject: localStorage.getItem("sprintRunningObject")
-        ? JSON.parse(localStorage.getItem("sprintRunningObject"))
-        : {
-            1: "Não Iniciada",
-            2: "Não Iniciada",
-            3: "Não Iniciada",
-            4: "Não Iniciada",
-            5: "Não Iniciada",
-            6: "Não Iniciada",
-            7: "Não Iniciada",
-            8: "Não Iniciada"
-          },
       activitiesObject: {
         1: [],
         2: [],
@@ -138,11 +67,11 @@ export default {
     };
   },
   props: {
-    sprintNumber: Number,
-    courseIndex: Number,
+    sprint: Object,
     course: Object,
     grouping: String,
-    reload: Boolean
+    status: String,
+    update: Function
   },
   methods: {
     async startSprint(sprintNumber, pcsta) {
@@ -171,21 +100,8 @@ export default {
             courseId: pcsta.courseId,
             grouping: this.grouping
           };
-          const sprintStarted = await startSprint(sprintInfo, pcstaPayload);
-          if (sprintStarted.status === 201) {
-            this.$swal.close();
-            const sprintRunningObject = JSON.parse(
-              localStorage.getItem("sprintRunningObject")
-            );
-            const newSprintRunningObject = {
-              ...sprintRunningObject,
-              [sprintNumber]: "Em execução"
-            };
-            localStorage.setItem(
-              "sprintRunningObject",
-              JSON.stringify(newSprintRunningObject)
-            );
-          }
+          await startSprint(sprintInfo, pcstaPayload);
+          this.update();
         } catch (err) {
           const self = this;
           showError(
@@ -209,21 +125,8 @@ export default {
           currentSprintInfo.sprintNumber === sprintNumber
         ) {
           currentSprintInfo.isFinished = true;
-          const endedSprint = await endSprint(currentSprintInfo);
-          if (endedSprint.status === 200) {
-            const sprintRunningObject = JSON.parse(
-              localStorage.getItem("sprintRunningObject")
-            );
-            const newSprintRunningObject = {
-              ...sprintRunningObject,
-              [sprintNumber]: "Finalizada"
-            };
-            localStorage.setItem(
-              "sprintRunningObject",
-              JSON.stringify(newSprintRunningObject)
-            );
-          }
-          return;
+          await endSprint(currentSprintInfo);
+          this.update();
         }
       }
     },

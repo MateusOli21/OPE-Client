@@ -3,12 +3,13 @@
     <v-row>
       <v-col md="12">
         <div class="d-flex space-between">
-          <h2>{{ !isStudent ? (currentStage === 'Backlog Global' ? 'Backlog Prometido' : currentStage) : currentStage }}</h2>
+          <h2>{{ currentStage }}</h2>
           <GiveGrade :sprintInfo="sprintInfo" v-if="currentStage === 'Backlog da Sprint' && blockedBoard && !isStudent" />
         </div>
         <div v-if="currentStage === 'Backlog da Sprint' && blockedBoard" class="text-right">
           <small class="red--text">Sprint finalizada</small>
         </div>
+        <ModalCardsBlocked v-if="blockedBoard || !isStudent" :cards="handleCards(cards, currentStage)"/>
         <div v-if="currentStage === 'Backlog da Sprint'" class="d-flex justify-end">
           <div class="select-sprint">
             <v-select
@@ -30,6 +31,7 @@
 
 <script>
 import GiveGrade from '../TeacherPage/GiveGrade';
+import ModalCardsBlocked from './ModalCardsBlocked';
 
 export default {
   data() {
@@ -45,16 +47,21 @@ export default {
     onchange: Function,
     blockedBoard: Boolean,
     isStudent: Boolean,
-    sprintInfo: Object
+    sprintInfo: Object,
+    cards: Array
   },
   components: {
-    GiveGrade
+    GiveGrade,
+    ModalCardsBlocked
   },
   methods: {
     async changeSprintNumber(sprintNumber) {
       this.sprintSelected = sprintNumber;
       this.$emit("update:sprintSelected", sprintNumber);
       this.onchange();
+    },
+    handleCards(cards, stage) {
+      return cards.filter(card => card.status === stage)
     }
   }
 };

@@ -2,7 +2,7 @@
   <div class="text-center">
     <v-bottom-sheet v-model="sheet" inset>
       <template v-slot:activator="{ on }">
-        <v-btn icon v-on="on">
+        <v-btn icon v-on="on" :disabled="disabled">
           <v-icon>mdi-eye-outline</v-icon>
         </v-btn>
       </template>
@@ -68,7 +68,8 @@ export default {
     sheet: false
   }),
   props: {
-    card: Object
+    card: Object,
+    disabled: Boolean
   },
   computed: {
     priorityCaptalized() {

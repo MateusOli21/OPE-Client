@@ -13,7 +13,13 @@
                 </div>
               </v-card-title>
               <v-card-text>
-                <ExpansionPanelGrouping :courses="courses" />
+                <ExpansionPanelGrouping
+                  :courses="courses"
+                  :currentGrouping="currentGrouping"
+                  :sprintsInfoOfGrouping="sprintsInfoOfGrouping"
+                  :updateComponent="updateComponent"
+                  :key="key"
+                />
               </v-card-text>
             </v-card>
           </v-col>
@@ -25,7 +31,12 @@
 
 <script>
 import { getGoogleUserData } from "../../services/LocalForage";
-import { getActivitiesByGrouping, verifyActvitiesByGrouping, createActivitiesByGrouping } from "../../services/SprintApi";
+import {
+  getActivitiesByGrouping,
+  verifyActvitiesByGrouping,
+  createActivitiesByGrouping,
+  getSprintInfo
+} from "../../services/SprintApi";
 import { showLoader, showWarning, showError } from "../../helpers/sweetAlert";
 import ExpansionPanelGrouping from "./ExpansionPanelGrouping";
 
@@ -40,7 +51,9 @@ export default {
       ],
       activities: [],
       courses: [],
-      currentGrouping: ""
+      sprintsInfoOfGrouping: [],
+      currentGrouping: "",
+      key: 0
     };
   },
   async beforeCreate() {
@@ -51,22 +64,29 @@ export default {
     ExpansionPanelGrouping
   },
   methods: {
-    async getCoursesOfGrouping(grouping) {
+    async updateComponent() {
+      await this.getCoursesOfGrouping(this.currentGrouping, true);
+      this.key = ++this.key;
+    },
+    async getCoursesOfGrouping(grouping, isUpdate) {
       const self = this;
       try {
-        this.currentGrouping = grouping;
-        showLoader(self, "Verificando atividades contínuas");
-        const { data: { needToCreate }} = await verifyActvitiesByGrouping(grouping, this.user.email)
-        this.$swal.close()
-        if (needToCreate) {
-          showLoader(self, "Criando atividades contínuas");
-          await createActivitiesByGrouping(grouping, this.user.email)
+        if (!isUpdate) {
+          this.currentGrouping = grouping;
+          showLoader(self, "Verificando atividades contínuas");
+          const {
+            data: { needToCreate }
+          } = await verifyActvitiesByGrouping(grouping, this.user.email);
+          this.$swal.close();
+          if (needToCreate) {
+            showLoader(self, "Criando atividades contínuas");
+            await createActivitiesByGrouping(grouping, this.user.email);
+          }
+          showLoader(self, "Carregando as turmas");
+        } else {
+          showLoader(self, "Atualizando a sprint");
         }
-        showLoader(self, "Carregando as turmas");
-        const { data } = await getActivitiesByGrouping(
-          grouping,
-          this.user.email
-        );
+        let { data } = await getActivitiesByGrouping(grouping, this.user.email);
         if (!data.length)
           setTimeout(
             () =>
@@ -77,12 +97,16 @@ export default {
             1000
           );
         this.$swal.close();
-        this.courses = {
-          courses: data,
-          grouping
-        };
+        const sprintsInfoOfGrouping = await Promise.all(
+          data.map(async course => {
+            const { data } = await getSprintInfo(course.pcsta._id);
+            return { pcstaId: course.pcsta._id, sprintInfos: data };
+          })
+        );
+        this.courses = data;
+        this.sprintsInfoOfGrouping = Object.values(sprintsInfoOfGrouping);
       } catch (err) {
-        showError(self, err, 'Algo deu errado, por favor, tente novamente.')
+        showError(self, err, "Algo deu errado, por favor, tente novamente.");
       }
     }
   }
