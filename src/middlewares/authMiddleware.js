@@ -4,7 +4,6 @@ import {
   setObject,
   getItem
 } from '../services/LocalForage'
-window.localStorage.removeItem('sprintRunningObject')
 
 export const authMiddleware = async (to, from, next) => {
   const path = await getItem('path')
