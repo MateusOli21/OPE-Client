@@ -12,7 +12,7 @@
     "core-js": "^2.6.5",
     "dotenv": "^8.1.0",
     "localforage": "^1.7.3",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "vue": "^2.6.10",
     "vue-kanban": "^1.6.0-0",
     "vue-loading-overlay": "^3.2.0",
